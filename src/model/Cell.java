@@ -189,3 +189,4 @@ public class Cell {
                            cellNumber, currentOccupancy, capacity, securityLevel, status);
     }
 }
+
