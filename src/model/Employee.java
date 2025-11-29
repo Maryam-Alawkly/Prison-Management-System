@@ -64,6 +64,10 @@ public class Employee extends Person {
         this.salary = salary;
     }
     
+    public void setHireDate(String hireDate) {
+        this.hireDate = hireDate;
+    }
+    
     public void setStatus(String status) {
         this.status = status;
     }
@@ -127,6 +131,3 @@ public class Employee extends Person {
         return "Active".equals(this.status);
     }
 }
-
-
-
