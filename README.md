@@ -5,8 +5,7 @@ A Java-based management system for prison operations using Object-Oriented Progr
 
 ## 🎓 Student Information
 - **Name:** Maryam Abdulmunem
-- **ID:** 262507
-- **Course:** PGCS653 - Advanced OOP
+- **Course:** Advanced OOP
 - **University:** Omer AL-mukhtar University
 
 ## 🛠 Technologies
