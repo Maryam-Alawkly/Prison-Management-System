@@ -30,7 +30,7 @@ public class PrisonerDAO {
             return rowsInserted > 0;
             
         } catch (SQLException e) {
-            System.err.println("❌ Error adding prisoner: " + e.getMessage());
+            System.err.println("Error adding prisoner: " + e.getMessage());
             return false;
         }
     }
