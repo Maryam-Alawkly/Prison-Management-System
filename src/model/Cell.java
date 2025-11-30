@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Cell class represents a prison cell in the facility
- * Manages cell information, capacity, and assigned prisoners
+ * Cell class represents a prison cell in the facility Manages cell information,
+ * capacity, and assigned prisoners
  */
 public class Cell {
     private String cellNumber;
@@ -15,7 +15,7 @@ public class Cell {
     private String securityLevel; // "Minimum", "Medium", "Maximum"
     private String status; // "Occupied", "Vacant", "Under Maintenance"
     private List<String> assignedPrisoners; // List of prisoner IDs
-    
+
     /**
      * Constructor for Cell class
      * @param cellNumber Unique cell identifier
@@ -32,45 +32,58 @@ public class Cell {
         this.status = "Vacant";
         this.assignedPrisoners = new ArrayList<>();
     }
-    
+
     // Getter methods
     public String getCellNumber() {
         return cellNumber;
     }
-    
+
     public String getCellType() {
         return cellType;
     }
-    
+
     public int getCapacity() {
         return capacity;
     }
-    
+
     public int getCurrentOccupancy() {
         return currentOccupancy;
     }
-    
+
     public String getSecurityLevel() {
         return securityLevel;
     }
-    
+
     public String getStatus() {
         return status;
     }
-    
+
     public List<String> getAssignedPrisoners() {
         return new ArrayList<>(assignedPrisoners); // Return copy for encapsulation
     }
-    
+
     // Setter methods
     public void setCellType(String cellType) {
         this.cellType = cellType;
     }
-    
+
+    public void setCapacity(int capacity) {
+        this.capacity = capacity;
+    }
+
+    public void setCurrentOccupancy(int currentOccupancy) {
+        this.currentOccupancy = currentOccupancy;
+        updateStatus();
+    }
+
     public void setSecurityLevel(String securityLevel) {
         this.securityLevel = securityLevel;
     }
-    
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
     /**
      * Assign a prisoner to this cell
      * @param prisonerId ID of prisoner to assign
@@ -78,6 +91,9 @@ public class Cell {
      */
     public boolean assignPrisoner(String prisonerId) {
         if (currentOccupancy < capacity) {
+            if (assignedPrisoners.contains(prisonerId)) {
+                return true; // Already assigned
+            }
             assignedPrisoners.add(prisonerId);
             currentOccupancy++;
             updateStatus();
@@ -85,7 +101,7 @@ public class Cell {
         }
         return false; // Cell is full
     }
-    
+
     /**
      * Remove a prisoner from this cell
      * @param prisonerId ID of prisoner to remove
@@ -99,7 +115,7 @@ public class Cell {
         }
         return removed;
     }
-    
+
     /**
      * Check if cell has available space
      * @return true if cell can accommodate more prisoners
@@ -107,7 +123,7 @@ public class Cell {
     public boolean hasAvailableSpace() {
         return currentOccupancy < capacity;
     }
-    
+
     /**
      * Get available space in cell
      * @return number of available spots
@@ -115,15 +131,18 @@ public class Cell {
     public int getAvailableSpace() {
         return capacity - currentOccupancy;
     }
-    
+
     /**
      * Calculate occupancy percentage
      * @return occupancy percentage (0-100)
      */
     public double getOccupancyPercentage() {
+        if (capacity == 0) {
+            return 0;
+        }
         return (double) currentOccupancy / capacity * 100;
     }
-    
+
     /**
      * Update cell status based on occupancy
      */
@@ -136,57 +155,56 @@ public class Cell {
             status = "Occupied";
         }
     }
-    
+
     /**
      * Put cell under maintenance
      */
     public void setUnderMaintenance() {
         this.status = "Under Maintenance";
     }
-    
+
     /**
      * Check if cell is available for new prisoners
      * @return true if cell can accept new prisoners
      */
     public boolean isAvailable() {
-        return "Vacant".equals(status) || "Occupied".equals(status);
+        return ("Vacant".equals(status) || "Occupied".equals(status)) && currentOccupancy < capacity;
     }
-    
+
     /**
      * Override toString method
      */
     @Override
     public String toString() {
-        return "Cell " + cellNumber + 
-               " | Type: " + cellType + 
-               " | Occupancy: " + currentOccupancy + "/" + capacity + 
-               " | Security: " + securityLevel + 
-               " | Status: " + status;
+        return "Cell " + cellNumber
+                + " | Type: " + cellType
+                + " | Occupancy: " + currentOccupancy + "/" + capacity
+                + " | Security: " + securityLevel
+                + " | Status: " + status;
     }
-    
+
     /**
      * Get detailed cell information
      * @return Detailed string with all cell data
      */
     public String getCellDetails() {
-        return "Cell Number: " + cellNumber +
-               "\nCell Type: " + cellType +
-               "\nCapacity: " + capacity +
-               "\nCurrent Occupancy: " + currentOccupancy +
-               "\nAvailable Space: " + getAvailableSpace() +
-               "\nOccupancy Percentage: " + String.format("%.1f", getOccupancyPercentage()) + "%" +
-               "\nSecurity Level: " + securityLevel +
-               "\nStatus: " + status +
-               "\nAssigned Prisoners: " + (assignedPrisoners.isEmpty() ? "None" : assignedPrisoners.toString());
+        return "Cell Number: " + cellNumber
+                + "\nCell Type: " + cellType
+                + "\nCapacity: " + capacity
+                + "\nCurrent Occupancy: " + currentOccupancy
+                + "\nAvailable Space: " + getAvailableSpace()
+                + "\nOccupancy Percentage: " + String.format("%.1f", getOccupancyPercentage()) + "%"
+                + "\nSecurity Level: " + securityLevel
+                + "\nStatus: " + status
+                + "\nAssigned Prisoners: " + (assignedPrisoners.isEmpty() ? "None" : assignedPrisoners.toString());
     }
-    
+
     /**
      * Get cell summary for reports
      * @return Summary string
      */
     public String getCellSummary() {
-        return String.format("Cell %s: %d/%d prisoners (%s) - %s", 
-                           cellNumber, currentOccupancy, capacity, securityLevel, status);
+        return String.format("Cell %s: %d/%d prisoners (%s) - %s",
+                cellNumber, currentOccupancy, capacity, securityLevel, status);
     }
 }
-
