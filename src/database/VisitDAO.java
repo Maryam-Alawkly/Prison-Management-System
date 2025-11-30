@@ -498,25 +498,27 @@ public class VisitDAO {
      * cancelledVisits]
      */
     public int[] getVisitStatistics() {
-        int totalVisits = getTotalVisits();
-        int completedVisits = getCompletedVisitsCount();
+        String sql = "SELECT "
+                + "COUNT(*) as total, "
+                + "SUM(CASE WHEN status = 'Completed' THEN 1 ELSE 0 END) as completed, "
+                + "SUM(CASE WHEN status = 'Scheduled' THEN 1 ELSE 0 END) as scheduled, "
+                + "SUM(CASE WHEN status = 'Cancelled' THEN 1 ELSE 0 END) as cancelled "
+                + "FROM visits";
 
-        String sqlScheduled = "SELECT COUNT(*) as total FROM visits WHERE status = 'Scheduled'";
-        String sqlCancelled = "SELECT COUNT(*) as total FROM visits WHERE status = 'Cancelled'";
-
+        int totalVisits = 0;
+        int completedVisits = 0;
         int scheduledVisits = 0;
         int cancelledVisits = 0;
 
         try (Connection conn = DatabaseConnection.getConnection();
                 Statement stmt = conn.createStatement();
-                ResultSet rs1 = stmt.executeQuery(sqlScheduled);
-                ResultSet rs2 = stmt.executeQuery(sqlCancelled)) {
+                ResultSet rs = stmt.executeQuery(sql)) {
 
-            if (rs1.next()) {
-                scheduledVisits = rs1.getInt("total");
-            }
-            if (rs2.next()) {
-                cancelledVisits = rs2.getInt("total");
+            if (rs.next()) {
+                totalVisits = rs.getInt("total");
+                completedVisits = rs.getInt("completed");
+                scheduledVisits = rs.getInt("scheduled");
+                cancelledVisits = rs.getInt("cancelled");
             }
 
         } catch (SQLException e) {
@@ -524,5 +526,9 @@ public class VisitDAO {
         }
 
         return new int[]{totalVisits, completedVisits, scheduledVisits, cancelledVisits};
+    }
+
+    public int[] getVisitsByStatus() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
