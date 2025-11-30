@@ -4,9 +4,14 @@ import database.DatabaseConnection;
 import database.PrisonerDAO;
 import database.EmployeeDAO;
 import database.CellDAO;
+import database.VisitorDAO;
+import database.VisitDAO;
 import model.Prisoner;
 import model.Employee;
 import model.Cell;
+import model.Visitor;
+import model.Visit;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class TestDatabase {
@@ -62,26 +67,54 @@ public class TestDatabase {
             System.out.println(c.toString());
         }
 
-        // Test available cells
-        List<Cell> availableCells = cellDAO.getAvailableCells();
-        System.out.println("\n=== Available Cells ===");
-        for (Cell c : availableCells) {
-            System.out.println(c.toString());
+        // Test VisitorDAO operations
+        VisitorDAO visitorDAO = new VisitorDAO();
+
+        // Add a new visitor
+        Visitor newVisitor = new Visitor("V001", "Test Visitor", "0912555444", "Brother", "P001");
+        boolean visitorAdded = visitorDAO.addVisitor(newVisitor);
+        System.out.println(visitorAdded ? "Visitor added successfully!" : "Failed to add visitor");
+
+        // Approve visitor
+        boolean approved = visitorDAO.approveVisitor("V001");
+        System.out.println(approved ? "Visitor approved successfully!" : "Failed to approve visitor");
+
+        // Get all visitors
+        List<Visitor> visitors = visitorDAO.getAllVisitors();
+        System.out.println("\n=== All Visitors ===");
+        for (Visitor v : visitors) {
+            System.out.println(v.toString());
         }
 
-        // Test occupancy statistics
-        int[] stats = cellDAO.getOccupancyStatistics();
-        System.out.println("\n=== Occupancy Statistics ===");
-        System.out.println("Total Capacity: " + stats[0]);
-        System.out.println("Total Occupancy: " + stats[1]);
-        System.out.println("Available Space: " + stats[2]);
+        // Test VisitDAO operations
+        VisitDAO visitDAO = new VisitDAO();
 
-        // Test cell by security level
-        List<Cell> mediumSecurityCells = cellDAO.getCellsBySecurityLevel("Medium");
-        System.out.println("\n=== Medium Security Cells ===");
-        for (Cell c : mediumSecurityCells) {
-            System.out.println(c.toString());
+        // Add a new visit
+        Visit newVisit = new Visit("VIS001", "P001", "V001", LocalDateTime.now().plusDays(1), 60);
+        boolean visitAdded = visitDAO.addVisit(newVisit);
+        System.out.println(visitAdded ? "Visit added successfully!" : "Failed to add visit");
+
+        // Get all visits
+        List<Visit> visits = visitDAO.getAllVisits();
+        System.out.println("\n=== All Visits ===");
+        for (Visit v : visits) {
+            System.out.println(v.toString());
         }
+
+        // Test visit statistics
+        int[] visitStats = visitDAO.getVisitStatistics();
+        System.out.println("\n=== Visit Statistics ===");
+        System.out.println("Total Visits: " + visitStats[0]);
+        System.out.println("Completed Visits: " + visitStats[1]);
+        System.out.println("Scheduled Visits: " + visitStats[2]);
+        System.out.println("Cancelled Visits: " + visitStats[3]);
+
+        // Test visitor statistics
+        int totalVisitors = visitorDAO.getTotalVisitors();
+        int approvedVisitors = visitorDAO.getApprovedVisitorsCount();
+        System.out.println("\n=== Visitor Statistics ===");
+        System.out.println("Total Visitors: " + totalVisitors);
+        System.out.println("Approved Visitors: " + approvedVisitors);
 
         // Close connection
         DatabaseConnection.closeConnection();
