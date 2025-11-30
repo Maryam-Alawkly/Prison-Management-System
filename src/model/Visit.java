@@ -79,7 +79,11 @@ public class Visit {
         return actualEndTime;
     }
     
-    // Setter methods
+    // Setter methods - ADDED FOR DATABASE COMPATIBILITY
+    public void setVisitId(String visitId) {
+        this.visitId = visitId;
+    }
+    
     public void setPrisonerId(String prisonerId) {
         this.prisonerId = prisonerId;
     }
@@ -96,8 +100,20 @@ public class Visit {
         this.duration = duration;
     }
     
+    public void setStatus(String status) {
+        this.status = status;
+    }
+    
     public void setNotes(String notes) {
         this.notes = notes;
+    }
+    
+    public void setActualStartTime(LocalDateTime actualStartTime) {
+        this.actualStartTime = actualStartTime;
+    }
+    
+    public void setActualEndTime(LocalDateTime actualEndTime) {
+        this.actualEndTime = actualEndTime;
     }
     
     /**
@@ -123,9 +139,7 @@ public class Visit {
     public void cancelVisit(String cancellationNotes) {
         this.status = "Cancelled";
         this.notes = cancellationNotes;
-    }
-    
-    /**
+    }/**
      * Reschedule the visit to a new date and time
      * @param newDateTime New date and time for the visit
      */
@@ -138,7 +152,7 @@ public class Visit {
     /**
      * Check if visit is scheduled for today
      * @return true if visit is scheduled for today
-     * */
+     */
     public boolean isScheduledForToday() {
         return visitDateTime.toLocalDate().equals(LocalDateTime.now().toLocalDate());
     }
