@@ -35,7 +35,39 @@ public class Employee extends Person {
         this.salary = salary;
         this.hireDate = java.time.LocalDate.now().toString();
         this.status = "Active";
+        this.username = ""; // Initialize new fields
+        this.password = "";
         this.role = "Officer";
+        this.lastLogin = "";
+        this.isActive = true;
+    }
+
+    /**
+     * Full constructor with all fields
+     *
+     * @param id Employee ID
+     * @param name Employee name
+     * @param phone Contact phone
+     * @param position Job position
+     * @param department Department
+     * @param salary Monthly salary
+     * @param username System username
+     * @param password System password
+     * @param role User role
+     */
+    public Employee(String id, String name, String phone,
+            String position, String department, double salary,
+            String username, String password, String role) {
+        super(id, name, phone);
+        this.position = position;
+        this.department = department;
+        this.salary = salary;
+        this.hireDate = java.time.LocalDate.now().toString();
+        this.status = "Active";
+        this.username = username;
+        this.password = password;
+        this.role = role;
+        this.lastLogin = "";
         this.isActive = true;
     }
 
@@ -146,6 +178,22 @@ public class Employee extends Person {
      */
     public void terminateEmployee() {
         this.status = "Inactive";
+        this.isActive = false;
+    }
+
+    /**
+     * Activate employee
+     */
+    public void activateEmployee() {
+        this.status = "Active";
+        this.isActive = true;
+    }
+
+    /**
+     * Record login activity
+     */
+    public void recordLogin() {
+        this.lastLogin = java.time.LocalDate.now().toString();
     }
 
     /**
@@ -172,6 +220,8 @@ public class Employee extends Person {
                 + "\nSalary: $" + salary
                 + "\nHire Date: " + hireDate
                 + "\nStatus: " + status
+                + "\nRole: " + role
+                + "\nUsername: " + (username.isEmpty() ? "Not set" : username)
                 + "\nAnnual Salary: $" + calculateAnnualSalary();
     }
 
@@ -191,5 +241,27 @@ public class Employee extends Person {
      */
     public boolean isOfficer() {
         return "Officer".equalsIgnoreCase(this.role);
+    }
+
+    /**
+     * Check if employee can manage system
+     *
+     * @return true if employee has administrative privileges
+     */
+    public boolean canManageSystem() {
+        return isAdministrator() || "Manager".equalsIgnoreCase(this.role);
+    }
+
+    /**
+     * Validate employee credentials
+     *
+     * @param inputUsername Username to validate
+     * @param inputPassword Password to validate
+     * @return true if credentials are valid
+     */
+    public boolean validateCredentials(String inputUsername, String inputPassword) {
+        return this.username.equals(inputUsername)
+                && this.password.equals(inputPassword)
+                && this.isActive;
     }
 }
