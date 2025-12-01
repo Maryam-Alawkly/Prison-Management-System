@@ -44,6 +44,7 @@ CREATE TABLE visitors (
     status VARCHAR(20) DEFAULT 'Pending',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (prisoner_id) REFERENCES prisoners(prisoner_id)
+    ON DELETE CASCADE
 );
 
 -- Table: visits
@@ -58,8 +59,10 @@ CREATE TABLE visits (
     actual_start_datetime DATETIME,
     actual_end_datetime DATETIME,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (prisoner_id) REFERENCES prisoners(prisoner_id),
+    FOREIGN KEY (prisoner_id) REFERENCES prisoners(prisoner_id)
+    ON DELETE CASCADE,
     FOREIGN KEY (visitor_id) REFERENCES visitors(visitor_id)
+    ON DELETE CASCADE
 );
 
 -- Table: cells
@@ -72,3 +75,4 @@ CREATE TABLE cells (
     status VARCHAR(20) DEFAULT 'Vacant',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
