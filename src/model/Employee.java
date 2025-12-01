@@ -1,18 +1,25 @@
 package model;
 
 /**
- * Employee class represents a staff member in the prison system
- * Inherits from Person class and adds employee-specific properties
+ * Employee class represents a staff member in the prison system Inherits from
+ * Person class and adds employee-specific properties
  */
 public class Employee extends Person {
+
     private String position;
     private String department;
     private double salary;
     private String hireDate;
-    private String status; // "Active", "Inactive", "Suspended"
-    
+    private String status;
+    private String username;
+    private String password;
+    private String role;
+    private String lastLogin;
+    private boolean isActive;
+
     /**
      * Constructor for Employee class
+     *
      * @param id Employee ID
      * @param name Employee name
      * @param phone Contact phone
@@ -20,68 +27,112 @@ public class Employee extends Person {
      * @param department Department
      * @param salary Monthly salary
      */
-    public Employee(String id, String name, String phone, 
-                   String position, String department, double salary) {
+    public Employee(String id, String name, String phone,
+            String position, String department, double salary) {
         super(id, name, phone);
         this.position = position;
         this.department = department;
         this.salary = salary;
         this.hireDate = java.time.LocalDate.now().toString();
         this.status = "Active";
+        this.role = "Officer";
+        this.isActive = true;
     }
-    
+
     // Getter methods
     public String getPosition() {
         return position;
     }
-    
+
     public String getDepartment() {
         return department;
     }
-    
+
     public double getSalary() {
         return salary;
     }
-    
+
     public String getHireDate() {
         return hireDate;
     }
-    
+
     public String getStatus() {
         return status;
     }
-    
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public String getLastLogin() {
+        return lastLogin;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
     // Setter methods
     public void setPosition(String position) {
         this.position = position;
     }
-    
+
     public void setDepartment(String department) {
         this.department = department;
     }
-    
+
     public void setSalary(double salary) {
         this.salary = salary;
     }
-    
+
     public void setHireDate(String hireDate) {
         this.hireDate = hireDate;
     }
-    
+
     public void setStatus(String status) {
         this.status = status;
     }
-    
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    public void setLastLogin(String lastLogin) {
+        this.lastLogin = lastLogin;
+    }
+
+    public void setActive(boolean isActive) {
+        this.isActive = isActive;
+    }
+
     /**
      * Calculate annual salary
+     *
      * @return Annual salary (monthly salary * 12)
      */
     public double calculateAnnualSalary() {
         return this.salary * 12;
     }
-    
+
     /**
      * Promote employee to new position with salary increase
+     *
      * @param newPosition New job position
      * @param newSalary New salary amount
      */
@@ -89,45 +140,56 @@ public class Employee extends Person {
         this.position = newPosition;
         this.salary = newSalary;
     }
-    
+
     /**
      * Terminate employee
      */
     public void terminateEmployee() {
         this.status = "Inactive";
     }
-    
+
     /**
      * Override toString method to display employee information
      */
     @Override
     public String toString() {
-        return "Employee: " + getName() + 
-               " | Position: " + position + 
-               " | Department: " + department + 
-               " | Salary: $" + salary;
+        return "Employee: " + getName()
+                + " | Position: " + position
+                + " | Department: " + department
+                + " | Salary: $" + salary;
     }
-    
+
     /**
      * Get detailed employee information
+     *
      * @return Detailed string with all employee data
      */
     public String getEmployeeDetails() {
-        return "Employee ID: " + getId() +
-               "\nName: " + getName() +
-               "\nPosition: " + position +
-               "\nDepartment: " + department +
-               "\nSalary: $" + salary +
-               "\nHire Date: " + hireDate +
-               "\nStatus: " + status +
-               "\nAnnual Salary: $" + calculateAnnualSalary();
+        return "Employee ID: " + getId()
+                + "\nName: " + getName()
+                + "\nPosition: " + position
+                + "\nDepartment: " + department
+                + "\nSalary: $" + salary
+                + "\nHire Date: " + hireDate
+                + "\nStatus: " + status
+                + "\nAnnual Salary: $" + calculateAnnualSalary();
     }
-    
+
     /**
-     * Check if employee is active
-     * @return true if employee status is "Active"
+     * Check if employee is administrator
+     *
+     * @return true if employee role is Administrator
      */
-    public boolean isActive() {
-        return "Active".equals(this.status);
+    public boolean isAdministrator() {
+        return "Administrator".equalsIgnoreCase(this.role);
+    }
+
+    /**
+     * Check if employee is officer
+     *
+     * @return true if employee role is Officer
+     */
+    public boolean isOfficer() {
+        return "Officer".equalsIgnoreCase(this.role);
     }
 }
