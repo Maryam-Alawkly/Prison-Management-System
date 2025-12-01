@@ -1,5 +1,7 @@
 package model;
 
+import java.time.LocalDate;
+
 /**
  * Prisoner class represents an inmate in the prison system
  * Inherits from Person class and adds prisoner-specific properties
@@ -100,5 +102,9 @@ public class Prisoner extends Person {
      */
     public void transferPrisoner() {
         this.status = "Transferred";
+    }
+
+    public void setAdmissionDate(LocalDate value) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
