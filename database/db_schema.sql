@@ -76,3 +76,15 @@ CREATE TABLE cells (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+
+-- Add login columns to employees table
+ALTER TABLE employees 
+ADD COLUMN username VARCHAR(50) UNIQUE,
+ADD COLUMN password VARCHAR(100),
+ADD COLUMN role VARCHAR(20) DEFAULT 'Officer',
+ADD COLUMN last_login DATETIME,
+ADD COLUMN is_active BOOLEAN DEFAULT TRUE;
+
+-- Insert a dedicated admin user if needed
+-- INSERT INTO employees (employee_id, name, username, password, role, position, department, salary, hire_date) 
+-- VALUES ('ADMIN001', 'System Administrator', 'admin', 'admin123', 'Administrator', 'System Admin', 'IT', 5000.00, CURDATE());
