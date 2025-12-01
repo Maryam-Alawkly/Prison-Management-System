@@ -108,4 +108,8 @@ public class PrisonerDAO {
             return false;
         }
     }
+
+    public Prisoner[] searchPrisoners(String searchTerm) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }
