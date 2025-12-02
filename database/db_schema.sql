@@ -29,6 +29,11 @@ CREATE TABLE employees (
     salary DECIMAL(10,2),
     hire_date DATE,
     status VARCHAR(20) DEFAULT 'Active',
+    username VARCHAR(50) UNIQUE,
+    password VARCHAR(50),
+    role VARCHAR(20) DEFAULT 'Officer',
+    last_login DATE DEFAULT NULL,
+    is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -70,21 +75,11 @@ CREATE TABLE cells (
     cell_number VARCHAR(10) PRIMARY KEY,
     cell_type VARCHAR(20),
     capacity INT,
-    current_occupancy INT DEFAULT 0,
+    cemployeesurrent_occupancy INT DEFAULT 0,
     security_level VARCHAR(20),
     status VARCHAR(20) DEFAULT 'Vacant',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 
--- Add login columns to employees table
-ALTER TABLE employees 
-ADD COLUMN username VARCHAR(50) UNIQUE,
-ADD COLUMN password VARCHAR(100),
-ADD COLUMN role VARCHAR(20) DEFAULT 'Officer',
-ADD COLUMN last_login DATETIME,
-ADD COLUMN is_active BOOLEAN DEFAULT TRUE;
 
--- Insert a dedicated admin user if needed
--- INSERT INTO employees (employee_id, name, username, password, role, position, department, salary, hire_date) 
--- VALUES ('ADMIN001', 'System Administrator', 'admin', 'admin123', 'Administrator', 'System Admin', 'IT', 5000.00, CURDATE());
