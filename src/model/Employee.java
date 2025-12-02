@@ -1,5 +1,7 @@
 package model;
 
+import java.time.LocalDateTime;
+
 /**
  * Employee class represents a staff member in the prison system Inherits from
  * Person class and adds employee-specific properties
@@ -38,7 +40,7 @@ public class Employee extends Person {
         this.username = ""; // Initialize new fields
         this.password = "";
         this.role = "Officer";
-        this.lastLogin = "";
+        this.lastLogin = null;
         this.isActive = true;
     }
 
@@ -67,7 +69,7 @@ public class Employee extends Person {
         this.username = username;
         this.password = password;
         this.role = role;
-        this.lastLogin = "";
+        this.lastLogin = null;
         this.isActive = true;
     }
 
@@ -193,7 +195,7 @@ public class Employee extends Person {
      * Record login activity
      */
     public void recordLogin() {
-        this.lastLogin = java.time.LocalDate.now().toString();
+        this.lastLogin = LocalDateTime.now().toString();
     }
 
     /**

@@ -14,6 +14,9 @@ public class Main {
         Employee officer1 = new Employee("E001", "John Smith", "0911223344",
                                        "Prison Officer", "Security", 2500.00);
         
+        // Test Employee
+        Employee admin1 = new Employee("ADMIN001", "Ahmed Ali", "0914785639", "System Administrator","manegment", 10546, "admin","admin123", "Administrator");
+        
         // Test Visitor
         Visitor visitor1 = new Visitor("V001", "Sarah Johnson", "0912334455",
                                       "Wife", "P001");
