@@ -1,30 +1,30 @@
 package database;
 
-import model.Cell;
+import model.PrisonCell;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Data Access Object for Cell entity Handles all database operations for prison
- * cells
+ * Data Access Object for PrisonCell entity Handles all database operations for
+ * prison cells
  */
-public class CellDAO {
+public class PrisonCellDAO {
 
     /**
      * Add a new cell to the database
      *
-     * @param cell Cell object to be added
+     * @param cell PrisonCell object to be added
      * @return true if successful, false otherwise
      */
-    public boolean addCell(Cell cell) {
+    public boolean addPrisonCell(PrisonCell cell) {
         String sql = "INSERT INTO cells (cell_number, cell_type, capacity, security_level) VALUES (?, ?, ?, ?)";
 
         try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, cell.getCellNumber());
-            stmt.setString(2, cell.getCellType());
+            stmt.setString(1, cell.getPrisonCellNumber());
+            stmt.setString(2, cell.getPrisonCellType());
             stmt.setInt(3, cell.getCapacity());
             stmt.setString(4, cell.getSecurityLevel());
 
@@ -42,8 +42,8 @@ public class CellDAO {
      *
      * @return List of all cells
      */
-    public List<Cell> getAllCells() {
-        List<Cell> cells = new ArrayList<>();
+    public List<PrisonCell> getAllPrisonCells() {
+        List<PrisonCell> cells = new ArrayList<>();
         String sql = "SELECT * FROM cells";
 
         try (Connection conn = DatabaseConnection.getConnection();
@@ -51,7 +51,7 @@ public class CellDAO {
                 ResultSet rs = stmt.executeQuery(sql)) {
 
             while (rs.next()) {
-                Cell cell = new Cell(
+                PrisonCell cell = new PrisonCell(
                         rs.getString("cell_number"),
                         rs.getString("cell_type"),
                         rs.getInt("capacity"),
@@ -72,10 +72,10 @@ public class CellDAO {
     /**
      * Find cell by cell number
      *
-     * @param cellNumber Cell number to find
-     * @return Cell object if found, null otherwise
+     * @param cellNumber PrisonCell number to find
+     * @return PrisonCell object if found, null otherwise
      */
-    public Cell getCellByNumber(String cellNumber) {
+    public PrisonCell getPrisonCellByNumber(String cellNumber) {
         String sql = "SELECT * FROM cells WHERE cell_number = ?";
 
         try (Connection conn = DatabaseConnection.getConnection();
@@ -85,7 +85,7 @@ public class CellDAO {
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
-                Cell cell = new Cell(
+                PrisonCell cell = new PrisonCell(
                         rs.getString("cell_number"),
                         rs.getString("cell_type"),
                         rs.getInt("capacity"),
@@ -106,19 +106,19 @@ public class CellDAO {
     /**
      * Update cell information
      *
-     * @param cell Cell object with updated data
+     * @param cell PrisonCell object with updated data
      * @return true if successful, false otherwise
      */
-    public boolean updateCell(Cell cell) {
+    public boolean updatePrisonCell(PrisonCell cell) {
         String sql = "UPDATE cells SET cell_type=?, capacity=?, security_level=?, status=? WHERE cell_number=?";
 
         try (Connection conn = DatabaseConnection.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, cell.getCellType());
+            stmt.setString(1, cell.getPrisonCellType());
             stmt.setInt(2, cell.getCapacity());
             stmt.setString(3, cell.getSecurityLevel());
             stmt.setString(4, cell.getStatus());
-            stmt.setString(5, cell.getCellNumber());
+            stmt.setString(5, cell.getPrisonCellNumber());
 
             int rowsUpdated = stmt.executeUpdate();
             return rowsUpdated > 0;
@@ -132,10 +132,10 @@ public class CellDAO {
     /**
      * Delete cell from database
      *
-     * @param cellNumber Cell number to delete
+     * @param cellNumber PrisonCell number to delete
      * @return true if successful, false otherwise
      */
-    public boolean deleteCell(String cellNumber) {
+    public boolean deletePrisonCell(String cellNumber) {
         String sql = "DELETE FROM cells WHERE cell_number = ?";
 
         try (Connection conn = DatabaseConnection.getConnection();
@@ -157,8 +157,8 @@ public class CellDAO {
      * @param securityLevel Security level to filter by
      * @return List of cells with specified security level
      */
-    public List<Cell> getCellsBySecurityLevel(String securityLevel) {
-        List<Cell> cells = new ArrayList<>();
+    public List<PrisonCell> getPrisonCellsBySecurityLevel(String securityLevel) {
+        List<PrisonCell> cells = new ArrayList<>();
         String sql = "SELECT * FROM cells WHERE security_level = ?";
 
         try (Connection conn = DatabaseConnection.getConnection();
@@ -168,7 +168,7 @@ public class CellDAO {
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
-                Cell cell = new Cell(
+                PrisonCell cell = new PrisonCell(
                         rs.getString("cell_number"),
                         rs.getString("cell_type"),
                         rs.getInt("capacity"),
@@ -192,8 +192,8 @@ public class CellDAO {
      * @param status Status to filter by
      * @return List of cells with specified status
      */
-    public List<Cell> getCellsByStatus(String status) {
-        List<Cell> cells = new ArrayList<>();
+    public List<PrisonCell> getPrisonCellsByStatus(String status) {
+        List<PrisonCell> cells = new ArrayList<>();
         String sql = "SELECT * FROM cells WHERE status = ?";
 
         try (Connection conn = DatabaseConnection.getConnection();
@@ -203,7 +203,7 @@ public class CellDAO {
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
-                Cell cell = new Cell(
+                PrisonCell cell = new PrisonCell(
                         rs.getString("cell_number"),
                         rs.getString("cell_type"),
                         rs.getInt("capacity"),
@@ -226,8 +226,8 @@ public class CellDAO {
      *
      * @return List of cells that have available space
      */
-    public List<Cell> getAvailableCells() {
-        List<Cell> cells = new ArrayList<>();
+    public List<PrisonCell> getAvailablePrisonCells() {
+        List<PrisonCell> cells = new ArrayList<>();
         String sql = "SELECT * FROM cells WHERE current_occupancy < capacity AND status != 'Under Maintenance'";
 
         try (Connection conn = DatabaseConnection.getConnection();
@@ -235,7 +235,7 @@ public class CellDAO {
                 ResultSet rs = stmt.executeQuery(sql)) {
 
             while (rs.next()) {
-                Cell cell = new Cell(
+                PrisonCell cell = new PrisonCell(
                         rs.getString("cell_number"),
                         rs.getString("cell_type"),
                         rs.getInt("capacity"),
@@ -256,11 +256,11 @@ public class CellDAO {
     /**
      * Update cell occupancy
      *
-     * @param cellNumber Cell number to update
+     * @param cellNumber PrisonCell number to update
      * @param newOccupancy New occupancy count
      * @return true if successful, false otherwise
      */
-    public boolean updateCellOccupancy(String cellNumber, int newOccupancy) {
+    public boolean updatePrisonCellOccupancy(String cellNumber, int newOccupancy) {
         String sql = "UPDATE cells SET current_occupancy = ? WHERE cell_number = ?";
 
         try (Connection conn = DatabaseConnection.getConnection();
@@ -281,13 +281,13 @@ public class CellDAO {
     /**
      * Increment cell occupancy by 1
      *
-     * @param cellNumber Cell number to update
+     * @param cellNumber PrisonCell number to update
      * @return true if successful, false otherwise
      */
-    public boolean incrementCellOccupancy(String cellNumber) {
-        Cell cell = getCellByNumber(cellNumber);
+    public boolean incrementPrisonCellOccupancy(String cellNumber) {
+        PrisonCell cell = getPrisonCellByNumber(cellNumber);
         if (cell != null && cell.hasAvailableSpace()) {
-            return updateCellOccupancy(cellNumber, cell.getCurrentOccupancy() + 1);
+            return updatePrisonCellOccupancy(cellNumber, cell.getCurrentOccupancy() + 1);
         }
         return false;
     }
@@ -295,13 +295,13 @@ public class CellDAO {
     /**
      * Decrement cell occupancy by 1
      *
-     * @param cellNumber Cell number to update
+     * @param cellNumber PrisonCell number to update
      * @return true if successful, false otherwise
      */
-    public boolean decrementCellOccupancy(String cellNumber) {
-        Cell cell = getCellByNumber(cellNumber);
+    public boolean decrementPrisonCellOccupancy(String cellNumber) {
+        PrisonCell cell = getPrisonCellByNumber(cellNumber);
         if (cell != null && cell.getCurrentOccupancy() > 0) {
-            return updateCellOccupancy(cellNumber, cell.getCurrentOccupancy() - 1);
+            return updatePrisonCellOccupancy(cellNumber, cell.getCurrentOccupancy() - 1);
         }
         return false;
     }
@@ -309,10 +309,10 @@ public class CellDAO {
     /**
      * Set cell under maintenance
      *
-     * @param cellNumber Cell number to set under maintenance
+     * @param cellNumber PrisonCell number to set under maintenance
      * @return true if successful, false otherwise
      */
-    public boolean setCellUnderMaintenance(String cellNumber) {
+    public boolean setPrisonCellUnderMaintenance(String cellNumber) {
         String sql = "UPDATE cells SET status = 'Under Maintenance' WHERE cell_number = ?";
 
         try (Connection conn = DatabaseConnection.getConnection();
@@ -333,7 +333,7 @@ public class CellDAO {
      *
      * @return Total count of cells
      */
-    public int getTotalCells() {
+    public int getTotalPrisonCells() {
         String sql = "SELECT COUNT(*) as total FROM cells";
         try (Connection conn = DatabaseConnection.getConnection();
                 Statement stmt = conn.createStatement();
