@@ -18,7 +18,7 @@ public class Prisoner extends Person {
      * @param name Prisoner name
      * @param phone Contact phone
      * @param crime Crime committed
-     * @param cellNumber Cell assignment
+     * @param cellNumber PrisonCell assignment
      * @param sentenceDuration Sentence length
      */
     public Prisoner(String id, String name, String phone, 
@@ -39,11 +39,11 @@ public class Prisoner extends Person {
         this.crime = crime; 
     }
     
-    public String getCellNumber() { 
+    public String getPrisonCellNumber() { 
         return cellNumber; 
     }
     
-    public void setCellNumber(String cellNumber) { 
+    public void setPrisonCellNumber(String cellNumber) { 
         this.cellNumber = cellNumber; 
     }
     
@@ -71,7 +71,7 @@ public class Prisoner extends Person {
     public String toString() {
         return "Prisoner: " + getName() + 
                " | Crime: " + crime + 
-               " | Cell: " + cellNumber + 
+               " | PrisonCell: " + cellNumber + 
                " | Status: " + status;
     }
     
@@ -83,7 +83,7 @@ public class Prisoner extends Person {
         return "ID: " + getId() + 
                "\nName: " + getName() + 
                "\nCrime: " + crime + 
-               "\nCell: " + cellNumber + 
+               "\nPrisonCell: " + cellNumber + 
                "\nSentence: " + sentenceDuration + 
                "\nStatus: " + status;
     }
