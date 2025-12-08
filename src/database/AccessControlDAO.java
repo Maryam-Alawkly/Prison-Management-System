@@ -6,19 +6,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Data Access Object for AccessControl entity
+ * Data Access Object for AccessControl entity. Handles all database operations
+ * related to access control management. Implements CRUD operations and
+ * permission validation logic.
  */
 public class AccessControlDAO {
 
     /**
-     * Add a new access control
+     * Adds a new access control record to the database.
+     *
+     * @param control AccessControl object containing control details
+     * @return true if insertion was successful, false otherwise
      */
     public boolean addAccessControl(AccessControl control) {
         String sql = "INSERT INTO access_controls (control_id, employee_id, employee_name, "
                 + "module, permission_level, granted_by, granted_date, expires_on, is_active) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, control.getControlId());
@@ -29,7 +34,7 @@ public class AccessControlDAO {
             stmt.setString(6, control.getGrantedBy());
             stmt.setDate(7, Date.valueOf(control.getGrantedDate()));
 
-            if (control.getExpiresOn() != null) {
+            if (control.getExpiresOn() != null && !control.getExpiresOn().isEmpty()) {
                 stmt.setDate(8, Date.valueOf(control.getExpiresOn()));
             } else {
                 stmt.setNull(8, Types.DATE);
@@ -47,13 +52,15 @@ public class AccessControlDAO {
     }
 
     /**
-     * Get all access controls
+     * Retrieves all access control records from the database.
+     *
+     * @return List of all AccessControl objects
      */
     public List<AccessControl> getAllAccessControls() {
         List<AccessControl> controls = new ArrayList<>();
         String sql = "SELECT * FROM access_controls ORDER BY employee_name, module";
 
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
                 Statement stmt = conn.createStatement();
                 ResultSet rs = stmt.executeQuery(sql)) {
 
@@ -63,20 +70,23 @@ public class AccessControlDAO {
             }
 
         } catch (SQLException e) {
-            System.err.println("Error getting access controls: " + e.getMessage());
+            System.err.println("Error retrieving access controls: " + e.getMessage());
         }
 
         return controls;
     }
 
     /**
-     * Get access controls by employee
+     * Retrieves access controls for a specific employee.
+     *
+     * @param employeeId ID of the employee
+     * @return List of AccessControl objects for the specified employee
      */
     public List<AccessControl> getAccessControlsByEmployee(String employeeId) {
         List<AccessControl> controls = new ArrayList<>();
         String sql = "SELECT * FROM access_controls WHERE employee_id = ? ORDER BY module";
 
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, employeeId);
@@ -88,20 +98,23 @@ public class AccessControlDAO {
             }
 
         } catch (SQLException e) {
-            System.err.println("Error getting access controls by employee: " + e.getMessage());
+            System.err.println("Error retrieving access controls by employee: " + e.getMessage());
         }
 
         return controls;
     }
 
     /**
-     * Get access controls by module
+     * Retrieves access controls for a specific module.
+     *
+     * @param module Name of the module
+     * @return List of AccessControl objects for the specified module
      */
     public List<AccessControl> getAccessControlsByModule(String module) {
         List<AccessControl> controls = new ArrayList<>();
         String sql = "SELECT * FROM access_controls WHERE module = ? ORDER BY employee_name";
 
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, module);
@@ -113,25 +126,28 @@ public class AccessControlDAO {
             }
 
         } catch (SQLException e) {
-            System.err.println("Error getting access controls by module: " + e.getMessage());
+            System.err.println("Error retrieving access controls by module: " + e.getMessage());
         }
 
         return controls;
     }
 
     /**
-     * Update access control
+     * Updates an existing access control record.
+     *
+     * @param control AccessControl object with updated values
+     * @return true if update was successful, false otherwise
      */
     public boolean updateAccessControl(AccessControl control) {
         String sql = "UPDATE access_controls SET permission_level = ?, expires_on = ?, "
                 + "is_active = ? WHERE control_id = ?";
 
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, control.getPermissionLevel());
 
-            if (control.getExpiresOn() != null) {
+            if (control.getExpiresOn() != null && !control.getExpiresOn().isEmpty()) {
                 stmt.setDate(2, Date.valueOf(control.getExpiresOn()));
             } else {
                 stmt.setNull(2, Types.DATE);
@@ -150,12 +166,16 @@ public class AccessControlDAO {
     }
 
     /**
-     * Revoke access control
+     * Revokes access control for an employee in a specific module.
+     *
+     * @param employeeId ID of the employee
+     * @param module Name of the module
+     * @return true if revocation was successful, false otherwise
      */
     public boolean revokeAccessControl(String employeeId, String module) {
         String sql = "UPDATE access_controls SET is_active = false WHERE employee_id = ? AND module = ?";
 
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, employeeId);
@@ -171,12 +191,15 @@ public class AccessControlDAO {
     }
 
     /**
-     * Delete access control
+     * Deletes an access control record by its ID.
+     *
+     * @param controlId ID of the access control record
+     * @return true if deletion was successful, false otherwise
      */
     public boolean deleteAccessControl(String controlId) {
         String sql = "DELETE FROM access_controls WHERE control_id = ?";
 
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, controlId);
@@ -190,13 +213,18 @@ public class AccessControlDAO {
     }
 
     /**
-     * Check if employee has permission for module
+     * Checks if an employee has the required permission for a module.
+     *
+     * @param employeeId ID of the employee
+     * @param module Name of the module
+     * @param requiredPermission Required permission level (View, Edit, Full)
+     * @return true if employee has required permission, false otherwise
      */
     public boolean hasPermission(String employeeId, String module, String requiredPermission) {
         String sql = "SELECT permission_level FROM access_controls "
                 + "WHERE employee_id = ? AND module = ? AND is_active = true";
 
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, employeeId);
@@ -205,21 +233,7 @@ public class AccessControlDAO {
 
             if (rs.next()) {
                 String permissionLevel = rs.getString("permission_level");
-
-                // Check permission hierarchy
-                switch (requiredPermission) {
-                    case "View":
-                        return permissionLevel.equals("View")
-                                || permissionLevel.equals("Edit")
-                                || permissionLevel.equals("Full");
-                    case "Edit":
-                        return permissionLevel.equals("Edit")
-                                || permissionLevel.equals("Full");
-                    case "Full":
-                        return permissionLevel.equals("Full");
-                    default:
-                        return false;
-                }
+                return checkPermissionHierarchy(permissionLevel, requiredPermission);
             }
 
         } catch (SQLException e) {
@@ -230,38 +244,68 @@ public class AccessControlDAO {
     }
 
     /**
-     * Get employee permissions summary
+     * Checks permission hierarchy based on permission levels.
+     *
+     * @param userPermission Permission level of the user
+     * @param requiredPermission Required permission level
+     * @return true if user permission meets or exceeds required permission
+     */
+    private boolean checkPermissionHierarchy(String userPermission, String requiredPermission) {
+        // Define permission hierarchy
+        switch (requiredPermission) {
+            case "View":
+                return userPermission.equals("View")
+                        || userPermission.equals("Edit")
+                        || userPermission.equals("Full");
+            case "Edit":
+                return userPermission.equals("Edit")
+                        || userPermission.equals("Full");
+            case "Full":
+                return userPermission.equals("Full");
+            default:
+                return false;
+        }
+    }
+
+    /**
+     * Retrieves a summary of all permissions for an employee.
+     *
+     * @param employeeId ID of the employee
+     * @return List of permission strings in format "module: permission_level"
      */
     public List<String> getEmployeePermissions(String employeeId) {
         List<String> permissions = new ArrayList<>();
         String sql = "SELECT module, permission_level FROM access_controls "
                 + "WHERE employee_id = ? AND is_active = true";
 
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, employeeId);
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
-                permissions.add(rs.getString("module") + ": " + rs.getString("permission_level"));
+                String permission = rs.getString("module") + ": " + rs.getString("permission_level");
+                permissions.add(permission);
             }
 
         } catch (SQLException e) {
-            System.err.println("Error getting employee permissions: " + e.getMessage());
+            System.err.println("Error retrieving employee permissions: " + e.getMessage());
         }
 
         return permissions;
     }
 
     /**
-     * Get expired access controls
+     * Retrieves all expired access controls that are still marked as active.
+     *
+     * @return List of expired AccessControl objects
      */
     public List<AccessControl> getExpiredAccessControls() {
         List<AccessControl> controls = new ArrayList<>();
         String sql = "SELECT * FROM access_controls WHERE expires_on < CURDATE() AND is_active = true";
 
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
                 Statement stmt = conn.createStatement();
                 ResultSet rs = stmt.executeQuery(sql)) {
 
@@ -271,14 +315,18 @@ public class AccessControlDAO {
             }
 
         } catch (SQLException e) {
-            System.err.println("Error getting expired access controls: " + e.getMessage());
+            System.err.println("Error retrieving expired access controls: " + e.getMessage());
         }
 
         return controls;
     }
 
     /**
-     * Create AccessControl object from ResultSet
+     * Creates an AccessControl object from a ResultSet.
+     *
+     * @param rs ResultSet containing access control data
+     * @return AccessControl object populated with data from ResultSet
+     * @throws SQLException if database error occurs
      */
     private AccessControl createAccessControlFromResultSet(ResultSet rs) throws SQLException {
         AccessControl control = new AccessControl(
@@ -292,12 +340,64 @@ public class AccessControlDAO {
         control.setGrantedBy(rs.getString("granted_by"));
         control.setGrantedDate(rs.getString("granted_date"));
 
-        if (rs.getDate("expires_on") != null) {
-            control.setExpiresOn(rs.getString("expires_on"));
+        Date expiresDate = rs.getDate("expires_on");
+        if (expiresDate != null) {
+            control.setExpiresOn(expiresDate.toString());
         }
 
         control.setActive(rs.getBoolean("is_active"));
 
         return control;
+    }
+
+    /**
+     * Counts total number of active access controls.
+     *
+     * @return Number of active access controls
+     */
+    public int getActiveAccessControlsCount() {
+        String sql = "SELECT COUNT(*) FROM access_controls WHERE is_active = true";
+
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)) {
+
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Error counting active access controls: " + e.getMessage());
+        }
+
+        return 0;
+    }
+
+    /**
+     * Counts number of access controls expiring within specified days.
+     *
+     * @param days Number of days to check
+     * @return Number of access controls expiring within specified days
+     */
+    public int getExpiringSoonCount(int days) {
+        String sql = "SELECT COUNT(*) FROM access_controls "
+                + "WHERE expires_on BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL ? DAY) "
+                + "AND is_active = true";
+
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, days);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Error counting expiring access controls: " + e.getMessage());
+        }
+
+        return 0;
     }
 }

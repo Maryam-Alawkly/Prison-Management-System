@@ -7,35 +7,60 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Data Access Object for SecurityAlert entity
+ * Data Access Object for SecurityAlert entity. Handles all database operations
+ * for security alert management including alert creation, status updates,
+ * retrieval, and monitoring. Uses Singleton pattern for database connection
+ * management.
  */
 public class SecurityAlertDAO {
 
     /**
-     * Create a new security alert
+     * Retrieves all active security alerts from the database. Active alerts are
+     * those with status 'Active'.
+     *
+     * @return List of active SecurityAlert objects
+     */
+    public List<SecurityAlert> getActiveSecurityAlerts() {
+        List<SecurityAlert> alerts = new ArrayList<>();
+        String query = "SELECT * FROM security_alerts WHERE status = 'Active' ORDER BY triggered_at DESC";
+
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(query)) {
+
+            while (rs.next()) {
+                SecurityAlert alert = extractAlertFromResultSet(rs);
+                alerts.add(alert);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error retrieving active security alerts: " + e.getMessage());
+        }
+        return alerts;
+    }
+
+    /**
+     * Creates a new security alert in the database.
+     *
+     * @param alert SecurityAlert object containing alert details
+     * @return true if alert was created successfully, false otherwise
      */
     public boolean createSecurityAlert(SecurityAlert alert) {
-        String sql = "INSERT INTO security_alerts (alert_id, alert_type, severity, description, "
-                + "location, triggered_at, triggered_by, status, requires_response, response_time) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO security_alerts (alert_id, alert_type, severity, description, "
+                + "location, triggered_by, status, triggered_at) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, NOW())";
 
-        try (Connection conn = DatabaseConnection.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(query)) {
 
-            stmt.setString(1, alert.getAlertId());
-            stmt.setString(2, alert.getAlertType());
-            stmt.setString(3, alert.getSeverity());
-            stmt.setString(4, alert.getDescription());
-            stmt.setString(5, alert.getLocation());
-            stmt.setTimestamp(6, Timestamp.valueOf(alert.getTriggeredAt()));
-            stmt.setString(7, alert.getTriggeredBy());
-            stmt.setString(8, alert.getStatus());
-            stmt.setBoolean(9, alert.isRequiresResponse());
-            stmt.setInt(10, alert.getResponseTime());
+            pstmt.setString(1, alert.getAlertId());
+            pstmt.setString(2, alert.getAlertType());
+            pstmt.setString(3, alert.getSeverity());
+            pstmt.setString(4, alert.getDescription());
+            pstmt.setString(5, alert.getLocation());
+            pstmt.setString(6, alert.getTriggeredBy());
+            pstmt.setString(7, alert.getStatus());
 
-            int rowsInserted = stmt.executeUpdate();
-            return rowsInserted > 0;
-
+            return pstmt.executeUpdate() > 0;
         } catch (SQLException e) {
             System.err.println("Error creating security alert: " + e.getMessage());
             return false;
@@ -43,182 +68,347 @@ public class SecurityAlertDAO {
     }
 
     /**
-     * Get active security alerts
+     * Retrieves security alerts triggered within the specified hours.
+     *
+     * @param hours Number of hours to look back for alerts
+     * @return List of recent SecurityAlert objects
      */
-    public List<SecurityAlert> getActiveSecurityAlerts() {
+    public List<SecurityAlert> getRecentSecurityAlerts(int hours) {
         List<SecurityAlert> alerts = new ArrayList<>();
-        String sql = "SELECT * FROM security_alerts WHERE status IN ('Active', 'Acknowledged') "
+        String query = "SELECT * FROM security_alerts WHERE triggered_at >= DATE_SUB(NOW(), INTERVAL ? HOUR) "
                 + "ORDER BY triggered_at DESC";
 
-        try (Connection conn = DatabaseConnection.getConnection();
-                Statement stmt = conn.createStatement();
-                ResultSet rs = stmt.executeQuery(sql)) {
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setInt(1, hours);
+            ResultSet rs = pstmt.executeQuery();
 
             while (rs.next()) {
-                SecurityAlert alert = createSecurityAlertFromResultSet(rs);
+                SecurityAlert alert = extractAlertFromResultSet(rs);
                 alerts.add(alert);
             }
-
         } catch (SQLException e) {
-            System.err.println("Error getting active security alerts: " + e.getMessage());
+            System.err.println("Error retrieving recent security alerts: " + e.getMessage());
         }
-
         return alerts;
     }
 
     /**
-     * Get critical alerts requiring immediate attention
+     * Retrieves security alerts by severity level.
+     *
+     * @param severity Severity level to filter by
+     * @return List of SecurityAlert objects with specified severity
      */
-    public List<SecurityAlert> getCriticalAlerts() {
+    public List<SecurityAlert> getSecurityAlertsBySeverity(String severity) {
         List<SecurityAlert> alerts = new ArrayList<>();
-        String sql = "SELECT * FROM security_alerts WHERE severity = 'Critical' AND status = 'Active' "
-                + "ORDER BY triggered_at DESC";
+        String query = "SELECT * FROM security_alerts WHERE severity = ? ORDER BY triggered_at DESC";
 
-        try (Connection conn = DatabaseConnection.getConnection();
-                Statement stmt = conn.createStatement();
-                ResultSet rs = stmt.executeQuery(sql)) {
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setString(1, severity);
+            ResultSet rs = pstmt.executeQuery();
 
             while (rs.next()) {
-                SecurityAlert alert = createSecurityAlertFromResultSet(rs);
-                alerts.add(alert);
+                alerts.add(extractAlertFromResultSet(rs));
             }
-
         } catch (SQLException e) {
-            System.err.println("Error getting critical alerts: " + e.getMessage());
+            System.err.println("Error retrieving alerts by severity: " + e.getMessage());
         }
-
         return alerts;
     }
 
     /**
-     * Acknowledge a security alert
+     * Acknowledges a security alert by updating its status.
+     *
+     * @param alertId Unique identifier of the alert
+     * @param acknowledgedBy Identifier of the person acknowledging the alert
+     * @return true if acknowledgment was successful, false otherwise
      */
-    public boolean acknowledgeAlert(String alertId, String employeeId) {
-        String sql = "UPDATE security_alerts SET status = 'Acknowledged', "
-                + "acknowledged_by = ?, acknowledged_at = NOW() WHERE alert_id = ?";
+    public boolean acknowledgeAlert(String alertId, String acknowledgedBy) {
+        String query = "UPDATE security_alerts SET status = 'Acknowledged', acknowledged_by = ?, "
+                + "acknowledged_at = NOW() WHERE alert_id = ?";
 
-        try (Connection conn = DatabaseConnection.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(query)) {
 
-            stmt.setString(1, employeeId);
-            stmt.setString(2, alertId);
-
-            int rowsUpdated = stmt.executeUpdate();
-            return rowsUpdated > 0;
-
+            pstmt.setString(1, acknowledgedBy);
+            pstmt.setString(2, alertId);
+            return pstmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.println("Error acknowledging alert: " + e.getMessage());
+            System.err.println("Error acknowledging security alert: " + e.getMessage());
             return false;
         }
     }
 
     /**
-     * Resolve a security alert
+     * Resolves a security alert by updating its status and adding resolution
+     * details.
+     *
+     * @param alertId Unique identifier of the alert
+     * @param resolvedBy Identifier of the person resolving the alert
+     * @param resolutionNotes Notes describing how the alert was resolved
+     * @return true if resolution was successful, false otherwise
      */
-    public boolean resolveAlert(String alertId, String employeeId, String notes) {
-        String sql = "UPDATE security_alerts SET status = 'Resolved', "
-                + "resolved_by = ?, resolved_at = NOW(), notes = ? WHERE alert_id = ?";
+    public boolean resolveAlert(String alertId, String resolvedBy, String resolutionNotes) {
+        String query = "UPDATE security_alerts SET status = 'Resolved', resolved_by = ?, "
+                + "resolved_at = NOW(), resolution_notes = ? WHERE alert_id = ?";
 
-        try (Connection conn = DatabaseConnection.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(query)) {
 
-            stmt.setString(1, employeeId);
-            stmt.setString(2, notes);
-            stmt.setString(3, alertId);
-
-            int rowsUpdated = stmt.executeUpdate();
-            return rowsUpdated > 0;
-
+            pstmt.setString(1, resolvedBy);
+            pstmt.setString(2, resolutionNotes);
+            pstmt.setString(3, alertId);
+            return pstmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.println("Error resolving alert: " + e.getMessage());
+            System.err.println("Error resolving security alert: " + e.getMessage());
             return false;
         }
     }
 
     /**
-     * Assign alert to employee
+     * Generates a unique alert identifier. Format: ALERT + YYYYMMDD + 4-digit
+     * random number.
+     *
+     * @return Unique alert identifier string
      */
-    public boolean assignAlert(String alertId, String employeeId) {
-        String sql = "UPDATE security_alerts SET assigned_to = ? WHERE alert_id = ?";
-
-        try (Connection conn = DatabaseConnection.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setString(1, employeeId);
-            stmt.setString(2, alertId);
-
-            int rowsUpdated = stmt.executeUpdate();
-            return rowsUpdated > 0;
-
-        } catch (SQLException e) {
-            System.err.println("Error assigning alert: " + e.getMessage());
-            return false;
-        }
+    public String generateAlertId() {
+        String prefix = "ALERT";
+        String date = java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd"));
+        String random = String.format("%04d", (int) (Math.random() * 10000));
+        return prefix + date + random;
     }
 
     /**
-     * Get alert statistics
+     * Retrieves a security alert by its unique identifier.
+     *
+     * @param alertId Unique identifier of the alert
+     * @return SecurityAlert object if found, null otherwise
      */
-    public int[] getAlertStatistics() {
-        String sql = "SELECT "
-                + "COUNT(*) as total, "
-                + "SUM(CASE WHEN status = 'Active' THEN 1 ELSE 0 END) as active, "
-                + "SUM(CASE WHEN status = 'Acknowledged' THEN 1 ELSE 0 END) as acknowledged, "
-                + "SUM(CASE WHEN status = 'Resolved' THEN 1 ELSE 0 END) as resolved, "
-                + "SUM(CASE WHEN severity = 'Critical' THEN 1 ELSE 0 END) as critical "
-                + "FROM security_alerts";
+    public SecurityAlert getAlertById(String alertId) {
+        String query = "SELECT * FROM security_alerts WHERE alert_id = ?";
 
-        int total = 0, active = 0, acknowledged = 0, resolved = 0, critical = 0;
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(query)) {
 
-        try (Connection conn = DatabaseConnection.getConnection();
-                Statement stmt = conn.createStatement();
-                ResultSet rs = stmt.executeQuery(sql)) {
+            pstmt.setString(1, alertId);
+            ResultSet rs = pstmt.executeQuery();
 
             if (rs.next()) {
-                total = rs.getInt("total");
-                active = rs.getInt("active");
-                acknowledged = rs.getInt("acknowledged");
-                resolved = rs.getInt("resolved");
-                critical = rs.getInt("critical");
+                return extractAlertFromResultSet(rs);
             }
-
         } catch (SQLException e) {
-            System.err.println("Error getting alert statistics: " + e.getMessage());
+            System.err.println("Error retrieving alert by ID: " + e.getMessage());
         }
-
-        return new int[]{total, active, acknowledged, resolved, critical};
+        return null;
     }
 
     /**
-     * Create SecurityAlert object from ResultSet
+     * Retrieves all security alerts from the database.
+     *
+     * @return List of all SecurityAlert objects
      */
-    private SecurityAlert createSecurityAlertFromResultSet(ResultSet rs) throws SQLException {
-        SecurityAlert alert = new SecurityAlert(
-                rs.getString("alert_id"),
-                rs.getString("alert_type"),
-                rs.getString("severity"),
-                rs.getString("description"),
-                rs.getString("location")
-        );
+    public List<SecurityAlert> getAllSecurityAlerts() {
+        List<SecurityAlert> alerts = new ArrayList<>();
+        String query = "SELECT * FROM security_alerts ORDER BY triggered_at DESC";
 
-        alert.setTriggeredAt(rs.getTimestamp("triggered_at").toLocalDateTime());
-        alert.setTriggeredBy(rs.getString("triggered_by"));
-        alert.setStatus(rs.getString("status"));
-        alert.setRequiresResponse(rs.getBoolean("requires_response"));
-        alert.setResponseTime(rs.getInt("response_time"));
-        alert.setAssignedTo(rs.getString("assigned_to"));
-        alert.setNotes(rs.getString("notes"));
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(query)) {
 
-        if (rs.getTimestamp("acknowledged_at") != null) {
-            alert.setAcknowledgedAt(rs.getTimestamp("acknowledged_at").toLocalDateTime());
+            while (rs.next()) {
+                SecurityAlert alert = extractAlertFromResultSet(rs);
+                alerts.add(alert);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error retrieving all security alerts: " + e.getMessage());
+        }
+        return alerts;
+    }
+
+    /**
+     * Retrieves alerts by alert type.
+     *
+     * @param alertType Type of alert to filter by
+     * @return List of SecurityAlert objects with specified type
+     */
+    public List<SecurityAlert> getAlertsByType(String alertType) {
+        List<SecurityAlert> alerts = new ArrayList<>();
+        String query = "SELECT * FROM security_alerts WHERE alert_type = ? ORDER BY triggered_at DESC";
+
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setString(1, alertType);
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                alerts.add(extractAlertFromResultSet(rs));
+            }
+        } catch (SQLException e) {
+            System.err.println("Error retrieving alerts by type: " + e.getMessage());
+        }
+        return alerts;
+    }
+
+    /**
+     * Retrieves alerts by location.
+     *
+     * @param location Location to filter by
+     * @return List of SecurityAlert objects from specified location
+     */
+    public List<SecurityAlert> getAlertsByLocation(String location) {
+        List<SecurityAlert> alerts = new ArrayList<>();
+        String query = "SELECT * FROM security_alerts WHERE location LIKE ? ORDER BY triggered_at DESC";
+
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setString(1, "%" + location + "%");
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                alerts.add(extractAlertFromResultSet(rs));
+            }
+        } catch (SQLException e) {
+            System.err.println("Error retrieving alerts by location: " + e.getMessage());
+        }
+        return alerts;
+    }
+
+    /**
+     * Gets the count of alerts by status.
+     *
+     * @param status Status to filter by
+     * @return Number of alerts with specified status
+     */
+    public int getAlertCountByStatus(String status) {
+        String query = "SELECT COUNT(*) as count FROM security_alerts WHERE status = ?";
+
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setString(1, status);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt("count");
+            }
+        } catch (SQLException e) {
+            System.err.println("Error counting alerts by status: " + e.getMessage());
+        }
+        return 0;
+    }
+
+    /**
+     * Gets the total number of security alerts.
+     *
+     * @return Total count of security alerts
+     */
+    public int getTotalAlertCount() {
+        String query = "SELECT COUNT(*) as total FROM security_alerts";
+
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(query)) {
+
+            if (rs.next()) {
+                return rs.getInt("total");
+            }
+        } catch (SQLException e) {
+            System.err.println("Error getting total alert count: " + e.getMessage());
+        }
+        return 0;
+    }
+
+    /**
+     * Updates an existing security alert.
+     *
+     * @param alert SecurityAlert object with updated information
+     * @return true if update was successful, false otherwise
+     */
+    public boolean updateAlert(SecurityAlert alert) {
+        String query = "UPDATE security_alerts SET alert_type = ?, severity = ?, description = ?, "
+                + "location = ?, status = ? WHERE alert_id = ?";
+
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setString(1, alert.getAlertType());
+            pstmt.setString(2, alert.getSeverity());
+            pstmt.setString(3, alert.getDescription());
+            pstmt.setString(4, alert.getLocation());
+            pstmt.setString(5, alert.getStatus());
+            pstmt.setString(6, alert.getAlertId());
+
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("Error updating security alert: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Deletes a security alert from the database.
+     *
+     * @param alertId Unique identifier of the alert to delete
+     * @return true if deletion was successful, false otherwise
+     */
+    public boolean deleteAlert(String alertId) {
+        String query = "DELETE FROM security_alerts WHERE alert_id = ?";
+
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setString(1, alertId);
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("Error deleting security alert: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Extracts SecurityAlert object from a ResultSet.
+     *
+     * @param resultSet ResultSet containing security alert data
+     * @return SecurityAlert object populated with data
+     * @throws SQLException if database error occurs
+     */
+    private SecurityAlert extractAlertFromResultSet(ResultSet resultSet) throws SQLException {
+        SecurityAlert alert = new SecurityAlert();
+
+        alert.setAlertId(resultSet.getString("alert_id"));
+        alert.setAlertType(resultSet.getString("alert_type"));
+        alert.setSeverity(resultSet.getString("severity"));
+        alert.setDescription(resultSet.getString("description"));
+        alert.setLocation(resultSet.getString("location"));
+        alert.setStatus(resultSet.getString("status"));
+
+        // Set triggered timestamp
+        Timestamp triggeredAt = resultSet.getTimestamp("triggered_at");
+        if (triggeredAt != null) {
+            alert.setTriggeredAt(triggeredAt.toLocalDateTime());
         }
 
-        if (rs.getTimestamp("resolved_at") != null) {
-            alert.setResolvedAt(rs.getTimestamp("resolved_at").toLocalDateTime());
+        // Set acknowledged timestamp
+        Timestamp acknowledgedAt = resultSet.getTimestamp("acknowledged_at");
+        if (acknowledgedAt != null) {
+            alert.setAcknowledgedAt(acknowledgedAt.toLocalDateTime());
         }
 
-        alert.setAcknowledgedBy(rs.getString("acknowledged_by"));
-        alert.setResolvedBy(rs.getString("resolved_by"));
+        // Set resolved timestamp
+        Timestamp resolvedAt = resultSet.getTimestamp("resolved_at");
+        if (resolvedAt != null) {
+            alert.setResolvedAt(resolvedAt.toLocalDateTime());
+        }
+
+        alert.setTriggeredBy(resultSet.getString("triggered_by"));
+        alert.setAcknowledgedBy(resultSet.getString("acknowledged_by"));
+        alert.setResolvedBy(resultSet.getString("resolved_by"));
+        alert.setResolutionNotes(resultSet.getString("resolution_notes"));
 
         return alert;
     }
