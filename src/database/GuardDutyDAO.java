@@ -11,9 +11,32 @@ import java.util.List;
 /**
  * Data Access Object for GuardDuty entity. Handles all database operations
  * related to guard duty scheduling, tracking, and management. Uses Singleton
- * pattern for database connection management.
+ * pattern for database connection management and DAO instance management.
  */
 public class GuardDutyDAO {
+
+    // Singleton instance
+    private static GuardDutyDAO instance;
+
+    /**
+     * Private constructor to enforce Singleton pattern.
+     */
+    private GuardDutyDAO() {
+        // Private constructor to prevent instantiation
+    }
+
+    /**
+     * Returns the single instance of GuardDutyDAO. Uses thread-safe lazy
+     * initialization.
+     *
+     * @return GuardDutyDAO instance
+     */
+    public static synchronized GuardDutyDAO getInstance() {
+        if (instance == null) {
+            instance = new GuardDutyDAO();
+        }
+        return instance;
+    }
 
     /**
      * Retrieves all guard duties from the database. Duties are ordered by duty

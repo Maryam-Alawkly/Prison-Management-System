@@ -7,12 +7,32 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Data Access Object for SecurityAlert entity. Handles all database operations
- * for security alert management including alert creation, status updates,
- * retrieval, and monitoring. Uses Singleton pattern for database connection
- * management.
+ * Data Access Object for SecurityAlert entity. Implements Singleton pattern for
+ * DAO instance management.
  */
 public class SecurityAlertDAO {
+
+    // Singleton instance
+    private static SecurityAlertDAO instance;
+
+    /**
+     * Private constructor to enforce Singleton pattern.
+     */
+    private SecurityAlertDAO() {
+        // Private constructor to prevent instantiation
+    }
+
+    /**
+     * Returns the single instance of SecurityAlertDAO.
+     *
+     * @return SecurityAlertDAO instance
+     */
+    public static synchronized SecurityAlertDAO getInstance() {
+        if (instance == null) {
+            instance = new SecurityAlertDAO();
+        }
+        return instance;
+    }
 
     /**
      * Retrieves all active security alerts from the database. Active alerts are

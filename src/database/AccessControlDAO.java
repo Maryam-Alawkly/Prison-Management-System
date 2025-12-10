@@ -6,12 +6,32 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Data Access Object for AccessControl entity. Handles all database operations
- * related to access control management. Implements CRUD operations and
- * permission validation logic.
+ * Data Access Object for AccessControl entity. 
+ * Implements Singleton pattern for DAO instance management.
  */
 public class AccessControlDAO {
-
+    
+    // Singleton instance
+    private static AccessControlDAO instance;
+    
+    /**
+     * Private constructor to enforce Singleton pattern.
+     */
+    private AccessControlDAO() {
+        // Private constructor to prevent instantiation
+    }
+    
+    /**
+     * Returns the single instance of AccessControlDAO.
+     *
+     * @return AccessControlDAO instance
+     */
+    public static synchronized AccessControlDAO getInstance() {
+        if (instance == null) {
+            instance = new AccessControlDAO();
+        }
+        return instance;
+    }
     /**
      * Adds a new access control record to the database.
      *

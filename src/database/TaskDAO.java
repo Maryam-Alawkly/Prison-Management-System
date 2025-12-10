@@ -6,12 +6,32 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Data Access Object for Task entity. Handles all database operations for task
- * management including task creation, assignment, status updates, and search
- * functionality. Uses Singleton pattern for database connection management.
+ * Data Access Object for Task entity.
+ * Implements Singleton pattern for DAO instance management.
  */
 public class TaskDAO {
-
+    
+    // Singleton instance
+    private static TaskDAO instance;
+    
+    /**
+     * Private constructor to enforce Singleton pattern.
+     */
+    private TaskDAO() {
+        // Private constructor to prevent instantiation
+    }
+    
+    /**
+     * Returns the single instance of TaskDAO.
+     *
+     * @return TaskDAO instance
+     */
+    public static synchronized TaskDAO getInstance() {
+        if (instance == null) {
+            instance = new TaskDAO();
+        }
+        return instance;
+    }
     /**
      * Retrieves all tasks from the database. Tasks are ordered by creation date
      * (newest first) and priority.

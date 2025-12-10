@@ -4,12 +4,32 @@ import model.Employee;
 import java.sql.*;
 
 /**
- * Authentication service for employee login management. Handles user
- * authentication, password validation, and login session tracking. This service
- * uses the Singleton DatabaseConnection for database operations.
+ * Authentication service for employee login management. 
+ * Implements Singleton pattern for service instance management.
  */
 public class AuthService {
-
+    
+    // Singleton instance
+    private static AuthService instance;
+    
+    /**
+     * Private constructor to enforce Singleton pattern.
+     */
+    private AuthService() {
+        // Private constructor to prevent instantiation
+    }
+    
+    /**
+     * Returns the single instance of AuthService.
+     *
+     * @return AuthService instance
+     */
+    public static synchronized AuthService getInstance() {
+        if (instance == null) {
+            instance = new AuthService();
+        }
+        return instance;
+    }
     /**
      * Authenticates an employee using username and password credentials.
      * Validates credentials against the database and returns employee

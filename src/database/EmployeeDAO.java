@@ -6,11 +6,32 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Data Access Object for Employee entity. Handles all database operations for
- * employee management including CRUD operations, authentication, and employee
- * data retrieval. Uses Singleton pattern for database connection management.
+ * Data Access Object for Employee entity. Implements Singleton pattern for DAO
+ * instance management.
  */
 public class EmployeeDAO {
+
+    // Singleton instance
+    private static EmployeeDAO instance;
+
+    /**
+     * Private constructor to enforce Singleton pattern.
+     */
+    private EmployeeDAO() {
+        // Private constructor to prevent instantiation
+    }
+
+    /**
+     * Returns the single instance of EmployeeDAO.
+     *
+     * @return EmployeeDAO instance
+     */
+    public static synchronized EmployeeDAO getInstance() {
+        if (instance == null) {
+            instance = new EmployeeDAO();
+        }
+        return instance;
+    }
 
     /**
      * Adds a new employee record to the database. Includes all employee details

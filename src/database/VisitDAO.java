@@ -7,13 +7,32 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Data Access Object for Visit entity. Handles all database operations for
- * prison visit management including visit scheduling, status tracking, and
- * statistical analysis. Uses Singleton pattern for database connection
- * management.
+ * Data Access Object for Visit entity.
+ * Implements Singleton pattern for DAO instance management.
  */
 public class VisitDAO {
-
+    
+    // Singleton instance
+    private static VisitDAO instance;
+    
+    /**
+     * Private constructor to enforce Singleton pattern.
+     */
+    private VisitDAO() {
+        // Private constructor to prevent instantiation
+    }
+    
+    /**
+     * Returns the single instance of VisitDAO.
+     *
+     * @return VisitDAO instance
+     */
+    public static synchronized VisitDAO getInstance() {
+        if (instance == null) {
+            instance = new VisitDAO();
+        }
+        return instance;
+    }
     /**
      * Adds a new visit to the database.
      *
@@ -294,7 +313,7 @@ public class VisitDAO {
             if (rowsUpdated > 0) {
                 Visit visit = getVisitById(visitId);
                 if (visit != null) {
-                    VisitorDAO visitorDAO = new VisitorDAO();
+                    VisitorDAO visitorDAO = VisitorDAO.getInstance();
                     visitorDAO.recordVisit(visit.getVisitorId());
                 }
             }

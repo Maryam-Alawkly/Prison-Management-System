@@ -7,13 +7,32 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Data Access Object for DailyReport entity. Handles database operations
- * related to daily security reports including creation, retrieval, searching,
- * and status management. Uses Singleton pattern for database connection
- * management.
+ * Data Access Object for DailyReport entity.
+ * Implements Singleton pattern for DAO instance management.
  */
 public class DailyReportDAO {
-
+    
+    // Singleton instance
+    private static DailyReportDAO instance;
+    
+    /**
+     * Private constructor to enforce Singleton pattern.
+     */
+    private DailyReportDAO() {
+        // Private constructor to prevent instantiation
+    }
+    
+    /**
+     * Returns the single instance of DailyReportDAO.
+     *
+     * @return DailyReportDAO instance
+     */
+    public static synchronized DailyReportDAO getInstance() {
+        if (instance == null) {
+            instance = new DailyReportDAO();
+        }
+        return instance;
+    }
     /**
      * Retrieves all daily reports from the database. Reports are ordered by
      * report date (newest first) and creation timestamp.

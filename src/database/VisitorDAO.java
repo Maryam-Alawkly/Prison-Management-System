@@ -6,12 +6,32 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Data Access Object for Visitor entity. Handles all database operations for
- * visitor management including visitor registration, approval, status
- * management, and visit tracking. Uses Singleton pattern for database
- * connection management.
+ * Data Access Object for Visitor entity. Implements Singleton pattern for DAO
+ * instance management.
  */
 public class VisitorDAO {
+
+    // Singleton instance
+    private static VisitorDAO instance;
+
+    /**
+     * Private constructor to enforce Singleton pattern.
+     */
+    private VisitorDAO() {
+        // Private constructor to prevent instantiation
+    }
+
+    /**
+     * Returns the single instance of VisitorDAO.
+     *
+     * @return VisitorDAO instance
+     */
+    public static synchronized VisitorDAO getInstance() {
+        if (instance == null) {
+            instance = new VisitorDAO();
+        }
+        return instance;
+    }
 
     /**
      * Adds a new visitor to the database.

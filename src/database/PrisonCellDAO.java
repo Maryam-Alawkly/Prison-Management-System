@@ -6,13 +6,32 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Data Access Object for PrisonCell entity. Handles all database operations for
- * prison cell management including cell creation, occupancy tracking, status
- * management, and statistical analysis. Uses Singleton pattern for database
- * connection management.
+ * Data Access Object for PrisonCell entity.
+ * Implements Singleton pattern for DAO instance management.
  */
 public class PrisonCellDAO {
-
+    
+    // Singleton instance
+    private static PrisonCellDAO instance;
+    
+    /**
+     * Private constructor to enforce Singleton pattern.
+     */
+    private PrisonCellDAO() {
+        // Private constructor to prevent instantiation
+    }
+    
+    /**
+     * Returns the single instance of PrisonCellDAO.
+     *
+     * @return PrisonCellDAO instance
+     */
+    public static synchronized PrisonCellDAO getInstance() {
+        if (instance == null) {
+            instance = new PrisonCellDAO();
+        }
+        return instance;
+    }
     /**
      * Adds a new prison cell to the database.
      *

@@ -9,11 +9,31 @@ import java.util.UUID;
 
 /**
  * Data Access Object for SecurityLog entity. Handles all database operations
- * for security logging and monitoring, including log creation, retrieval,
- * status updates, and statistical analysis. Uses Singleton pattern for database
- * connection management.
+ * for security logging and monitoring. Implements Singleton pattern.
  */
 public class SecurityLogDAO {
+
+    // Singleton instance
+    private static SecurityLogDAO instance;
+
+    /**
+     * Private constructor to enforce Singleton pattern.
+     */
+    private SecurityLogDAO() {
+        // Private constructor to prevent instantiation
+    }
+
+    /**
+     * Returns the single instance of SecurityLogDAO.
+     *
+     * @return SecurityLogDAO instance
+     */
+    public static synchronized SecurityLogDAO getInstance() {
+        if (instance == null) {
+            instance = new SecurityLogDAO();
+        }
+        return instance;
+    }
 
     /**
      * Adds a new security log entry to the database. Generates log ID and

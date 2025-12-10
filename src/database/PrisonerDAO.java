@@ -6,12 +6,32 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Data Access Object for Prisoner entity. Handles all database operations for
- * prisoner management including CRUD operations, search functionality, and
- * prisoner data retrieval. Uses Singleton pattern for database connection
- * management.
+ * Data Access Object for Prisoner entity. Implements Singleton pattern for DAO
+ * instance management.
  */
 public class PrisonerDAO {
+
+    // Singleton instance
+    private static PrisonerDAO instance;
+
+    /**
+     * Private constructor to enforce Singleton pattern.
+     */
+    private PrisonerDAO() {
+        // Private constructor to prevent instantiation
+    }
+
+    /**
+     * Returns the single instance of PrisonerDAO.
+     *
+     * @return PrisonerDAO instance
+     */
+    public static synchronized PrisonerDAO getInstance() {
+        if (instance == null) {
+            instance = new PrisonerDAO();
+        }
+        return instance;
+    }
 
     /**
      * Adds a new prisoner record to the database.
