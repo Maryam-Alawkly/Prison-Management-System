@@ -1,140 +1,124 @@
 package main;
 
-import database.DatabaseConnection;
+import controller.ApplicationController;
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import java.io.InputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Main application class for Prison Management System. This class serves as the
- * entry point for the JavaFX application and initializes the primary user
- * interface components.
+ * Main application entry point - ONLY responsible for launching JavaFX. All
+ * business logic is delegated to ApplicationController.
  */
 public class MainApp extends Application {
 
     private static final Logger LOGGER = Logger.getLogger(MainApp.class.getName());
-    private static final String LOGIN_FXML_PATH = "/view/Login.fxml";
     private static final String APPLICATION_ICON_PATH = "/images/login.png";
-    private static final String APPLICATION_TITLE = "Prison Management System - Login";
+    private static final String FALLBACK_ICON_PATH = "/images/login.png";
 
-    /**
-     * Main method - entry point for the Java application. Launches the JavaFX
-     * application.
-     *
-     * @param args Command line arguments passed to the application
-     */
     public static void main(String[] args) {
-        launch(args);
+        try {
+            // Set logging format for better readability
+            System.setProperty("java.util.logging.SimpleFormatter.format",
+                    "[%1$tF %1$tT] [%4$-7s] %5$s %n");
+
+            launch(args);
+        } catch (Exception e) {
+            System.err.println("FATAL: Application failed to launch");
+            e.printStackTrace();
+            System.exit(1);
+        }
     }
 
-    /**
-     * Initializes and displays the primary stage of the application. This
-     * method is called after the JavaFX runtime has been initialized.
-     *
-     * @param primaryStage The primary stage for this application
-     */
     @Override
     public void start(Stage primaryStage) {
         try {
-            initializeApplication(primaryStage);
-            testDatabaseConnection();
+            LOGGER.info("Application starting...");
+
+            // Set application icon with fallback mechanism
+            setApplicationIcon(primaryStage);
+
+            // Get ApplicationController instance (Facade pattern)
+            ApplicationController appController = ApplicationController.getInstance();
+
+            // Pass primary stage to controller
+            appController.setPrimaryStage(primaryStage);
+
+            // Delegate ALL initialization to ApplicationController
+            appController.initializeApplication();
+
         } catch (Exception exception) {
-            LOGGER.log(Level.SEVERE, "Failed to initialize application", exception);
-            showErrorDialog(exception.getMessage());
+            LOGGER.log(Level.SEVERE, "Critical failure during startup", exception);
+            showEmergencyErrorDialog(exception);
+            System.exit(1);
         }
     }
 
     /**
-     * Initializes the application user interface.
-     *
-     * @param primaryStage The primary stage to configure
-     * @throws Exception if FXML loading fails
-     */
-    private void initializeApplication(Stage primaryStage) throws Exception {
-        Parent root = loadFXML();
-        configureStage(primaryStage, root);
-        displayStage(primaryStage);
-    }
-
-    /**
-     * Loads the login interface from FXML file.
-     *
-     * @return Parent node containing the login interface
-     * @throws Exception if FXML file cannot be loaded
-     */
-    private Parent loadFXML() throws Exception {
-        return FXMLLoader.load(getClass().getResource(LOGIN_FXML_PATH));
-    }
-
-    /**
-     * Configures the primary stage properties.
-     *
-     * @param stage The stage to configure
-     * @param root The root node for the scene
-     */
-    private void configureStage(Stage stage, Parent root) {
-        setApplicationIcon(stage);
-        stage.setTitle(APPLICATION_TITLE);
-        stage.setResizable(false);
-        stage.setScene(new Scene(root));
-    }
-
-    /**
-     * Sets the application icon for the stage.
-     *
-     * @param stage The stage to set the icon on
+     * Set application icon with multiple fallback options
      */
     private void setApplicationIcon(Stage stage) {
+        InputStream iconStream = null;
+
         try {
-            Image icon = new Image(APPLICATION_ICON_PATH);
+            // Try primary icon path
+            iconStream = getClass().getResourceAsStream(APPLICATION_ICON_PATH);
+
+            if (iconStream == null) {
+                LOGGER.warning("Primary icon not found: " + APPLICATION_ICON_PATH);
+
+                // Try fallback icon
+                iconStream = getClass().getResourceAsStream(FALLBACK_ICON_PATH);
+
+                if (iconStream == null) {
+                    LOGGER.warning("Fallback icon not found: " + FALLBACK_ICON_PATH);
+                    return; // No icon available
+                }
+            }
+
+            Image icon = new Image(iconStream);
             stage.getIcons().add(icon);
+            LOGGER.info("Application icon loaded successfully");
+
         } catch (Exception exception) {
             LOGGER.log(Level.WARNING, "Could not load application icon", exception);
-        }
-    }
-
-    /**
-     * Displays the primary stage.
-     *
-     * @param stage The stage to display
-     */
-    private void displayStage(Stage stage) {
-        stage.show();
-        LOGGER.info("Application started successfully");
-    }
-
-    /**
-     * Tests the database connection during application initialization. This
-     * method attempts to establish a connection to the database and logs the
-     * result to the application logger.
-     */
-    private static void testDatabaseConnection() {
-        try {
-            boolean connectionSuccessful = DatabaseConnection.testStaticConnection();
-            if (connectionSuccessful) {
-                LOGGER.info("Database connection test completed successfully");
-            } else {
-                LOGGER.warning("Database connection test failed - connection not established");
+        } finally {
+            if (iconStream != null) {
+                try {
+                    iconStream.close();
+                } catch (Exception e) {
+                    LOGGER.log(Level.FINE, "Error closing icon stream", e);
+                }
             }
-        } catch (Exception exception) {
-            LOGGER.log(Level.SEVERE, "Database connection test failed", exception);
         }
     }
 
     /**
-     * Displays an error dialog when application initialization fails.
-     *
-     * @param errorMessage The error message to display
+     * Show emergency error dialog when JavaFX fails to initialize
      */
-    private void showErrorDialog(String errorMessage) {
-        // This method should be implemented with actual JavaFX dialog
-        LOGGER.severe("Application initialization error: " + errorMessage);
-        System.err.println("Critical error occurred: " + errorMessage);
-        System.err.println("Please check the application logs for more details.");
+    private void showEmergencyErrorDialog(Exception exception) {
+        // Console fallback if GUI is not available
+        System.err.println("=========================================");
+        System.err.println("CRITICAL APPLICATION ERROR");
+        System.err.println("=========================================");
+        System.err.println("Error: " + exception.getMessage());
+        System.err.println("Application cannot start. Please check:");
+        System.err.println("1. JavaFX is properly installed");
+        System.err.println("2. Required libraries are available");
+        System.err.println("3. System meets minimum requirements");
+        System.err.println("=========================================");
+        exception.printStackTrace();
+    }
+
+    @Override
+    public void stop() {
+        LOGGER.info("Application stopping...");
+
+        // Notify ApplicationController to cleanup
+        ApplicationController.getInstance().cleanup();
+
+        LOGGER.info("Application stopped");
     }
 }

@@ -107,7 +107,7 @@ public class TestDatabase {
     private static void testPrisonerOperations() {
         System.out.println("\n--- Testing PrisonerDAO Operations ---");
 
-        PrisonerDAO prisonerDAO = new PrisonerDAO();
+        PrisonerDAO prisonerDAO = PrisonerDAO.getInstance();
 
         // Test adding a new prisoner
         Prisoner newPrisoner = new Prisoner(
@@ -147,7 +147,7 @@ public class TestDatabase {
     private static void testEmployeeOperations() {
         System.out.println("\n--- Testing EmployeeDAO Operations ---");
 
-        EmployeeDAO employeeDAO = new EmployeeDAO();
+        EmployeeDAO employeeDAO = EmployeeDAO.getInstance();
 
         // Test adding a regular employee
         Employee newEmployee = new Employee(
@@ -207,7 +207,7 @@ public class TestDatabase {
     private static void testPrisonCellOperations() {
         System.out.println("\n--- Testing PrisonCellDAO Operations ---");
 
-        PrisonCellDAO cellDAO = new PrisonCellDAO();
+        PrisonCellDAO cellDAO = PrisonCellDAO.getInstance();
 
         // Test adding a new prison cell
         PrisonCell newPrisonCell = new PrisonCell(
@@ -245,7 +245,7 @@ public class TestDatabase {
     private static void testVisitorOperations() {
         System.out.println("\n--- Testing VisitorDAO Operations ---");
 
-        VisitorDAO visitorDAO = new VisitorDAO();
+        VisitorDAO visitorDAO = VisitorDAO.getInstance();
 
         // Test adding a new visitor
         Visitor newVisitor = new Visitor(
@@ -291,7 +291,7 @@ public class TestDatabase {
     private static void testVisitOperations() {
         System.out.println("\n--- Testing VisitDAO Operations ---");
 
-        VisitDAO visitDAO = new VisitDAO();
+        VisitDAO visitDAO = VisitDAO.getInstance();
 
         // Test adding a new visit
         Visit newVisit = new Visit(
@@ -330,8 +330,8 @@ public class TestDatabase {
     private static void testStatistics() {
         System.out.println("\n--- Testing Statistical Operations ---");
 
-        VisitorDAO visitorDAO = new VisitorDAO();
-        VisitDAO visitDAO = new VisitDAO();
+        VisitorDAO visitorDAO = VisitorDAO.getInstance();
+        VisitDAO visitDAO = VisitDAO.getInstance();
 
         try {
             // Test visitor statistics
@@ -386,10 +386,10 @@ public class TestDatabase {
         System.out.println("Cleaning up old test data...");
 
         try {
-            PrisonerDAO prisonerDAO = new PrisonerDAO();
+            PrisonerDAO prisonerDAO = PrisonerDAO.getInstance();
             // prisonerDAO.deletePrisoner("P005"); // Uncomment to enable prisoner cleanup
 
-            EmployeeDAO employeeDAO = new EmployeeDAO();
+            EmployeeDAO employeeDAO = EmployeeDAO.getInstance();
             // employeeDAO.deleteEmployee("E005"); // Uncomment to enable employee cleanup
             // employeeDAO.deleteEmployee("ADMIN001");
 
