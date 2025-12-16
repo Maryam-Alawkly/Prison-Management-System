@@ -1,22 +1,14 @@
 package model;
 
-import database.DatabaseConnection;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Objects;
 
 /**
  * SecurityAlert class represents a security alert in the prison management
- * system. This class manages alert information including type, severity,
- * status, and lifecycle timestamps. It also provides database operations for
- * retrieving and managing security alerts.
+ * system. This class encapsulates alert information including type, severity,
+ * status, and lifecycle timestamps. It follows the Single Responsibility
+ * Principle by focusing only on alert data representation and validation.
  */
 public class SecurityAlert {
 
@@ -73,7 +65,8 @@ public class SecurityAlert {
      * @param description Detailed description of the alert
      * @param location Location where alert was triggered
      */
-    public SecurityAlert(String alertId, String alertType, String severity, String description, String location) {
+    public SecurityAlert(String alertId, String alertType, String severity,
+            String description, String location) {
         this.alertId = alertId;
         this.alertType = alertType;
         this.severity = severity;
@@ -83,7 +76,6 @@ public class SecurityAlert {
         this.triggeredAt = LocalDateTime.now();
     }
 
-    // =================== Getter and Setter Methods ===================
     /**
      * Gets the unique alert identifier.
      *
@@ -336,158 +328,42 @@ public class SecurityAlert {
         this.assignedTo = assignedTo;
     }
 
-    // =================== Database Operation Methods ===================
     /**
-     * Retrieves all active security alerts from the database. Active alerts are
-     * those with status 'Active'. Results are ordered by trigger time in
-     * descending order (newest first).
+     * Gets the triggered timestamp in a formatted string.
      *
-     * @return List of active SecurityAlert objects, or empty list if none found
-     */
-    public List<SecurityAlert> getActiveSecurityAlerts() {
-        List<SecurityAlert> alerts = new ArrayList<>();
-        String query = "SELECT * FROM security_alerts WHERE status = 'Active' ORDER BY triggered_at DESC";
-
-        try (Connection conn = getConnection();
-                Statement stmt = conn.createStatement();
-                ResultSet rs = stmt.executeQuery(query)) {
-
-            while (rs.next()) {
-                SecurityAlert alert = extractAlertFromResultSet(rs);
-                alerts.add(alert);
-            }
-        } catch (SQLException e) {
-            System.err.println("Error getting active security alerts: " + e.getMessage());
-            e.printStackTrace();
-        }
-        return alerts;
-    }
-
-    /**
-     * Retrieves security alerts triggered within the specified time period.
-     * Alerts are filtered by trigger time relative to current database time.
-     *
-     * @param hours Number of hours to look back from current time
-     * @return List of recent SecurityAlert objects, or empty list if none found
-     */
-    public List<SecurityAlert> getRecentSecurityAlerts(int hours) {
-        List<SecurityAlert> alerts = new ArrayList<>();
-        String query = "SELECT * FROM security_alerts WHERE triggered_at >= DATE_SUB(NOW(), INTERVAL ? HOUR) "
-                + "ORDER BY triggered_at DESC";
-
-        try (Connection conn = getConnection();
-                PreparedStatement pstmt = conn.prepareStatement(query)) {
-
-            pstmt.setInt(1, hours);
-            ResultSet rs = pstmt.executeQuery();
-
-            while (rs.next()) {
-                SecurityAlert alert = extractAlertFromResultSet(rs);
-                alerts.add(alert);
-            }
-        } catch (SQLException e) {
-            System.err.println("Error getting recent security alerts: " + e.getMessage());
-            e.printStackTrace();
-        }
-        return alerts;
-    }
-
-    /**
-     * Helper method to get a database connection. Creates a new connection each
-     * time it's called.
-     *
-     * @return Database Connection object
-     * @throws SQLException if connection cannot be established
-     */
-    private Connection getConnection() throws SQLException {
-        return DatabaseConnection.getConnection();
-    }
-
-    // =================== Formatting and Utility Methods ===================
-    /**
-     * Gets the triggered timestamp in a formatted string. Returns "N/A" if
-     * timestamp is null.
-     *
-     * @return Formatted trigger timestamp, or "N/A" if null
+     * @return Formatted trigger timestamp, or "Not Triggered" if null
      */
     public String getFormattedTriggeredAt() {
         if (triggeredAt != null) {
-            return triggeredAt.toString();
+            return triggeredAt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         }
-        return "N/A";
+        return "Not Triggered";
     }
 
     /**
-     * Gets the acknowledged timestamp in a formatted string (yyyy-MM-dd
-     * HH:mm:ss). Returns "N/A" if timestamp is null.
+     * Gets the acknowledged timestamp in a formatted string.
      *
-     * @return Formatted acknowledgment timestamp, or "N/A" if null
+     * @return Formatted acknowledgment timestamp, or "Not Acknowledged" if null
      */
     public String getFormattedAcknowledgedAt() {
-        if (acknowledgedAt == null) {
-            return "N/A";
+        if (acknowledgedAt != null) {
+            return acknowledgedAt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         }
-        return acknowledgedAt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        return "Not Acknowledged";
     }
 
     /**
-     * Gets the resolved timestamp in a formatted string (yyyy-MM-dd HH:mm:ss).
-     * Returns "N/A" if timestamp is null.
+     * Gets the resolved timestamp in a formatted string.
      *
-     * @return Formatted resolution timestamp, or "N/A" if null
+     * @return Formatted resolution timestamp, or "Not Resolved" if null
      */
     public String getFormattedResolvedAt() {
-        if (resolvedAt == null) {
-            return "N/A";
-        }
-        return resolvedAt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-    }
-
-    /**
-     * Extracts SecurityAlert data from a ResultSet and creates a SecurityAlert
-     * object. This helper method maps database columns to SecurityAlert
-     * properties. Handles null values for timestamp fields.
-     *
-     * @param rs ResultSet containing alert data from database query
-     * @return SecurityAlert object populated with data from ResultSet
-     * @throws SQLException if database access error occurs
-     */
-    private SecurityAlert extractAlertFromResultSet(ResultSet rs) throws SQLException {
-        SecurityAlert alert = new SecurityAlert();
-
-        // Set basic alert properties
-        alert.setAlertId(rs.getString("alert_id"));
-        alert.setAlertType(rs.getString("alert_type"));
-        alert.setSeverity(rs.getString("severity"));
-        alert.setDescription(rs.getString("description"));
-        alert.setLocation(rs.getString("location"));
-        alert.setStatus(rs.getString("status"));
-        alert.setTriggeredBy(rs.getString("triggered_by"));
-        alert.setAcknowledgedBy(rs.getString("acknowledged_by"));
-        alert.setResolvedBy(rs.getString("resolved_by"));
-        alert.setResolutionNotes(rs.getString("resolution_notes"));
-        alert.setAssignedTo(rs.getString("assigned_to"));
-
-        // Convert SQL Timestamp to LocalDateTime, handling null values
-        Timestamp triggeredAt = rs.getTimestamp("triggered_at");
-        if (triggeredAt != null) {
-            alert.setTriggeredAt(triggeredAt.toLocalDateTime());
-        }
-
-        Timestamp acknowledgedAt = rs.getTimestamp("acknowledged_at");
-        if (acknowledgedAt != null) {
-            alert.setAcknowledgedAt(acknowledgedAt.toLocalDateTime());
-        }
-
-        Timestamp resolvedAt = rs.getTimestamp("resolved_at");
         if (resolvedAt != null) {
-            alert.setResolvedAt(resolvedAt.toLocalDateTime());
+            return resolvedAt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         }
-
-        return alert;
+        return "Not Resolved";
     }
 
-    // =================== Business Logic Methods ===================
     /**
      * Checks if the alert is currently active.
      *
@@ -532,6 +408,40 @@ public class SecurityAlert {
     }
 
     /**
+     * Checks if this alert has higher severity than the specified severity.
+     *
+     * @param otherSeverity Severity to compare against
+     * @return True if this alert has higher severity, false otherwise
+     */
+    public boolean hasHigherSeverityThan(String otherSeverity) {
+        int thisPriority = getSeverityPriority(this.severity);
+        int otherPriority = getSeverityPriority(otherSeverity);
+        return thisPriority > otherPriority;
+    }
+
+    /**
+     * Calculates the age of the alert in minutes.
+     *
+     * @return Age in minutes, or -1 if triggeredAt is null
+     */
+    public long getAlertAgeInMinutes() {
+        if (triggeredAt == null) {
+            return -1;
+        }
+        return java.time.Duration.between(triggeredAt, LocalDateTime.now()).toMinutes();
+    }
+
+    /**
+     * Determines if the alert needs immediate attention. Critical and High
+     * severity alerts need immediate attention.
+     *
+     * @return True if alert needs immediate attention, false otherwise
+     */
+    public boolean needsImmediateAttention() {
+        return SEVERITY_CRITICAL.equals(this.severity) || SEVERITY_HIGH.equals(this.severity);
+    }
+
+    /**
      * Returns a string representation of the alert. Provides a concise summary
      * for display purposes.
      *
@@ -539,7 +449,118 @@ public class SecurityAlert {
      */
     @Override
     public String toString() {
-        return String.format("SecurityAlert[ID=%s, Type=%s, Severity=%s, Status=%s]",
-                alertId, alertType, severity, status);
+        return String.format("SecurityAlert[ID=%s, Type=%s, Severity=%s, Status=%s, Location=%s]",
+                alertId, alertType, severity, status, location);
+    }
+
+    /**
+     * Compares this alert with another object for equality. Two alerts are
+     * equal if they have the same alert ID.
+     *
+     * @param obj Object to compare with
+     * @return True if objects are equal, false otherwise
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        SecurityAlert that = (SecurityAlert) obj;
+        return Objects.equals(alertId, that.alertId);
+    }
+
+    /**
+     * Returns the hash code for this alert. Based on the alert ID.
+     *
+     * @return Hash code
+     */
+    @Override
+    public int hashCode() {
+        return Objects.hash(alertId);
+    }
+
+    /**
+     * Gets the priority value for a severity level. Used for severity
+     * comparison.
+     *
+     * @param severity Severity level
+     * @return Priority value (higher = more severe)
+     */
+    private int getSeverityPriority(String severity) {
+        switch (severity) {
+            case SEVERITY_CRITICAL:
+                return 4;
+            case SEVERITY_HIGH:
+                return 3;
+            case SEVERITY_MEDIUM:
+                return 2;
+            case SEVERITY_LOW:
+                return 1;
+            default:
+                return 0;
+        }
+    }
+
+    /**
+     * Gets the duration between triggered and resolved times.
+     *
+     * @return Duration in minutes, or -1 if either timestamp is null
+     */
+    public long getResolutionDurationInMinutes() {
+        if (triggeredAt == null || resolvedAt == null) {
+            return -1;
+        }
+        return java.time.Duration.between(triggeredAt, resolvedAt).toMinutes();
+    }
+
+    /**
+     * Determines if the alert is overdue based on severity. Critical alerts are
+     * overdue after 5 minutes, High after 15, Medium after 30, Low after 60.
+     *
+     * @return True if alert is overdue, false otherwise
+     */
+    public boolean isOverdue() {
+        if (isResolved() || triggeredAt == null) {
+            return false;
+        }
+
+        long ageInMinutes = getAlertAgeInMinutes();
+        int threshold = getSeverityResponseThreshold(this.severity);
+
+        return ageInMinutes > threshold;
+    }
+
+    /**
+     * Gets the response time threshold in minutes for a severity level.
+     *
+     * @param severity Severity level
+     * @return Response threshold in minutes
+     */
+    private int getSeverityResponseThreshold(String severity) {
+        switch (severity) {
+            case SEVERITY_CRITICAL:
+                return 5;    // 5 minutes for critical
+            case SEVERITY_HIGH:
+                return 15;       // 15 minutes for high
+            case SEVERITY_MEDIUM:
+                return 30;     // 30 minutes for medium
+            case SEVERITY_LOW:
+                return 60;        // 60 minutes for low
+            default:
+                return 60;                  // Default 60 minutes
+        }
+    }
+
+    /**
+     * Creates a summary of the alert for quick reference.
+     *
+     * @return Alert summary string
+     */
+    public String getSummary() {
+        return String.format("%s: %s (Severity: %s, Status: %s)",
+                alertType, description, severity, status);
     }
 }
