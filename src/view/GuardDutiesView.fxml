@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" 
+            fx:controller="controller.GuardDutiesController"
+            style="-fx-background-color: #2c3e50;">
+
+    <!-- Header Section -->
+    <top>
+        <VBox spacing="10" style="-fx-background-color: #34495e; -fx-padding: 20;">
+            <Label text="Guard Duties Management" 
+                   style="-fx-text-fill: white; -fx-font-size: 28px; -fx-font-weight: bold;">
+                <font>
+                    <Font name="System Bold" size="28.0" />
+                </font>
+            </Label>
+            
+            <!-- Search and Filter Section -->
+            <HBox spacing="15" alignment="CENTER_LEFT">
+                <Label text="Search:" style="-fx-text-fill: white; -fx-font-size: 14px;" />
+                <TextField fx:id="searchField" promptText="Search by Officer, Location, or Duty Type" 
+                          style="-fx-background-color: #ecf0f1; -fx-border-color: #3498db; -fx-border-radius: 5; -fx-pref-width: 250; -fx-pref-height: 35;" />
+                
+                <Label text="Status:" style="-fx-text-fill: white; -fx-font-size: 14px;" />
+                <ComboBox fx:id="filterStatusComboBox" 
+                         style="-fx-background-color: #ecf0f1; -fx-border-color: #3498db; -fx-border-radius: 5; -fx-pref-width: 120; -fx-pref-height: 35;" />
+                
+                <Label text="Date:" style="-fx-text-fill: white; -fx-font-size: 14px;" />
+                <DatePicker fx:id="filterDatePicker" 
+                         style="-fx-background-color: #ecf0f1; -fx-border-color: #3498db; -fx-border-radius: 5; -fx-pref-width: 120; -fx-pref-height: 35;" />
+                
+                <Button text="Search" onAction="#handleSearch" 
+                       style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-border-radius: 5; -fx-pref-width: 100; -fx-pref-height: 35;" />
+                
+                <Button text="Clear" onAction="#handleClear" 
+                       style="-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-font-weight: bold; -fx-border-radius: 5; -fx-pref-width: 100; -fx-pref-height: 35;" />
+                
+                <Button text="Refresh" onAction="#handleRefresh" 
+                       style="-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-font-weight: bold; -fx-border-radius: 5; -fx-pref-width: 100; -fx-pref-height: 35;" />
+                
+                <Button text="My Duties" onAction="#handleMyDuties" 
+                       style="-fx-background-color: #9b59b6; -fx-text-fill: white; -fx-font-weight: bold; -fx-border-radius: 5; -fx-pref-width: 100; -fx-pref-height: 35;" />
+            </HBox>
+        </VBox>
+    </top>
+
+    <!-- Main Content: Guard Duties Table -->
+    <center>
+        <VBox spacing="15" style="-fx-padding: 15;">
+            <TableView fx:id="guardDutiesTable" style="-fx-background-color: #ecf0f1; -fx-border-color: #bdc3c7; -fx-border-radius: 5;">
+                <columns>
+                    <TableColumn fx:id="dutyIdColumn" text="Duty ID" minWidth="80" prefWidth="80" />
+                    <TableColumn fx:id="officerNameColumn" text="Officer" minWidth="120" prefWidth="120" />
+                    <TableColumn fx:id="dutyTypeColumn" text="Duty Type" minWidth="100" prefWidth="100" />
+                    <TableColumn fx:id="locationColumn" text="Location" minWidth="120" prefWidth="120" />
+                    <TableColumn fx:id="startTimeColumn" text="Start Time" minWidth="100" prefWidth="100" />
+                    <TableColumn fx:id="endTimeColumn" text="End Time" minWidth="100" prefWidth="100" />
+                    <TableColumn fx:id="statusColumn" text="Status" minWidth="80" prefWidth="80" />
+                    <TableColumn fx:id="priorityColumn" text="Priority" minWidth="80" prefWidth="80" />
+                    <TableColumn fx:id="completedTimeColumn" text="Completed" minWidth="100" prefWidth="100" />
+                </columns>
+            </TableView>
+            
+            <!-- Action Buttons -->
+            <HBox spacing="15" alignment="CENTER_RIGHT">
+                <Button text="Start Duty" onAction="#handleStartDuty" 
+                       style="-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-font-weight: bold; -fx-border-radius: 5; -fx-pref-width: 120; -fx-pref-height: 35;" />
+                <Button text="Complete Duty" onAction="#handleCompleteDuty" 
+                       style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-border-radius: 5; -fx-pref-width: 120; -fx-pref-height: 35;" />
+                <Button text="Report Issue" onAction="#handleReportIssue" 
+                       style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-border-radius: 5; -fx-pref-width: 120; -fx-pref-height: 35;" />
+                <Button text="View Logs" onAction="#handleViewLogs" 
+                       style="-fx-background-color: #f39c12; -fx-text-fill: white; -fx-font-weight: bold; -fx-border-radius: 5; -fx-pref-width: 120; -fx-pref-height: 35;" />
+                <Button text="Generate Report" onAction="#handleGenerateReport" 
+                       style="-fx-background-color: #1abc9c; -fx-text-fill: white; -fx-font-weight: bold; -fx-border-radius: 5; -fx-pref-width: 140; -fx-pref-height: 35;" />
+            </HBox>
+        </VBox>
+    </center>
+
+    <!-- Side Panel: Duty Details Form -->
+    <right>
+        <VBox spacing="20" style="-fx-background-color: #34495e; -fx-padding: 20; -fx-min-width: 350; -fx-max-width: 400;">
+            <Label text="Duty Details" style="-fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: bold;" />
+            
+            <Separator style="-fx-background-color: #7f8c8d;" />
+            
+            <GridPane hgap="10" vgap="15">
+                <columnConstraints>
+                    <ColumnConstraints minWidth="100" prefWidth="120" />
+                    <ColumnConstraints minWidth="150" prefWidth="200" />
+                </columnConstraints>
+                
+                <!-- Duty ID -->
+                <Label text="Duty ID:" style="-fx-text-fill: white;" GridPane.rowIndex="0" GridPane.columnIndex="0" />
+                <TextField fx:id="dutyIdField" promptText="Auto-generated" 
+                          style="-fx-background-color: #ecf0f1; -fx-border-color: #bdc3c7; -fx-border-radius: 5; -fx-pref-height: 35;" 
+                          GridPane.rowIndex="0" GridPane.columnIndex="1" editable="false" />
+                
+                <!-- Officer -->
+                <Label text="Officer:" style="-fx-text-fill: white;" GridPane.rowIndex="1" GridPane.columnIndex="0" />
+                <ComboBox fx:id="officerComboBox" 
+                         style="-fx-background-color: #ecf0f1; -fx-border-color: #bdc3c7; -fx-border-radius: 5; -fx-pref-height: 35;" 
+                         GridPane.rowIndex="1" GridPane.columnIndex="1" />
+                
+                <!-- Duty Type -->
+                <Label text="Duty Type:" style="-fx-text-fill: white;" GridPane.rowIndex="2" GridPane.columnIndex="0" />
+                <ComboBox fx:id="dutyTypeComboBox" 
+                         style="-fx-background-color: #ecf0f1; -fx-border-color: #bdc3c7; -fx-border-radius: 5; -fx-pref-height: 35;" 
+                         GridPane.rowIndex="2" GridPane.columnIndex="1" />
+                
+                <!-- Location -->
+                <Label text="Location:" style="-fx-text-fill: white;" GridPane.rowIndex="3" GridPane.columnIndex="0" />
+                <ComboBox fx:id="locationComboBox" 
+                         style="-fx-background-color: #ecf0f1; -fx-border-color: #bdc3c7; -fx-border-radius: 5; -fx-pref-height: 35;" 
+                         GridPane.rowIndex="3" GridPane.columnIndex="1" />
+                
+                <!-- Schedule -->
+                <Label text="Start Time:" style="-fx-text-fill: white;" GridPane.rowIndex="4" GridPane.columnIndex="0" />
+                <TextField fx:id="startTimeField" promptText="HH:MM" 
+                          style="-fx-background-color: #ecf0f1; -fx-border-color: #bdc3c7; -fx-border-radius: 5; -fx-pref-height: 35;" 
+                          GridPane.rowIndex="4" GridPane.columnIndex="1" />
+                
+                <Label text="End Time:" style="-fx-text-fill: white;" GridPane.rowIndex="5" GridPane.columnIndex="0" />
+                <TextField fx:id="endTimeField" promptText="HH:MM" 
+                          style="-fx-background-color: #ecf0f1; -fx-border-color: #bdc3c7; -fx-border-radius: 5; -fx-pref-height: 35;" 
+                          GridPane.rowIndex="5" GridPane.columnIndex="1" />
+                
+                <Label text="Date:" style="-fx-text-fill: white;" GridPane.rowIndex="6" GridPane.columnIndex="0" />
+                <DatePicker fx:id="datePicker" 
+                           style="-fx-background-color: #ecf0f1; -fx-border-color: #bdc3c7; -fx-border-radius: 5; -fx-pref-height: 35;" 
+                           GridPane.rowIndex="6" GridPane.columnIndex="1" />
+                
+                <!-- Status & Priority -->
+                <Label text="Status:" style="-fx-text-fill: white;" GridPane.rowIndex="7" GridPane.columnIndex="0" />
+                <ComboBox fx:id="statusComboBox" 
+                         style="-fx-background-color: #ecf0f1; -fx-border-color: #bdc3c7; -fx-border-radius: 5; -fx-pref-height: 35;" 
+                         GridPane.rowIndex="7" GridPane.columnIndex="1" />
+                
+                <Label text="Priority:" style="-fx-text-fill: white;" GridPane.rowIndex="8" GridPane.columnIndex="0" />
+                <ComboBox fx:id="priorityComboBox" 
+                         style="-fx-background-color: #ecf0f1; -fx-border-color: #bdc3c7; -fx-border-radius: 5; -fx-pref-height: 35;" 
+                         GridPane.rowIndex="8" GridPane.columnIndex="1" />
+                
+                <!-- Notes -->
+                <Label text="Notes:" style="-fx-text-fill: white;" GridPane.rowIndex="9" GridPane.columnIndex="0" />
+                <TextArea fx:id="notesArea" promptText="Additional notes..." wrapText="true"
+                         style="-fx-background-color: #ecf0f1; -fx-border-color: #bdc3c7; -fx-border-radius: 5; -fx-pref-height: 100;" 
+                         GridPane.rowIndex="9" GridPane.columnIndex="1" 
+                         GridPane.rowSpan="2" />
+            </GridPane>
+            
+            <Separator style="-fx-background-color: #7f8c8d;" />
+            
+            <!-- CRUD Buttons -->
+            <HBox spacing="15" alignment="CENTER">
+                <Button text="Add" onAction="#handleAddDuty" 
+                       style="-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-font-weight: bold; -fx-border-radius: 5; -fx-pref-width: 100; -fx-pref-height: 35;" />
+                <Button text="Update" onAction="#handleUpdateDuty" 
+                       style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-border-radius: 5; -fx-pref-width: 100; -fx-pref-height: 35;" />
+                <Button text="Delete" onAction="#handleDeleteDuty" 
+                       style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-border-radius: 5; -fx-pref-width: 100; -fx-pref-height: 35;" />
+                <Button text="Assign" onAction="#handleAssignDuty" 
+                       style="-fx-background-color: #9b59b6; -fx-text-fill: white; -fx-font-weight: bold; -fx-border-radius: 5; -fx-pref-width: 100; -fx-pref-height: 35;" />
+            </HBox>
+        </VBox>
+    </right>
+
+    <!-- Footer -->
+    <bottom>
+        <HBox style="-fx-background-color: #34495e; -fx-padding: 10;" alignment="CENTER">
+            <Label text="Guard Duties Management - Prison Management System © 2025" style="-fx-text-fill: #bdc3c7; -fx-font-size: 12px;" />
+        </HBox>
+    </bottom>
+</BorderPane>

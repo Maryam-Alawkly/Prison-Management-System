@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane xmlns="http://javafx.com/javafx/8" 
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="controller.CellViewController"
+            style="-fx-background-color: #2c3e50;">
+    
+    <!-- Header Section -->
+    <top>
+        <VBox spacing="10" style="-fx-background-color: #1e2a3a; -fx-padding: 15;">
+            <Label text="Prison Cells - View Only" 
+                   style="-fx-text-fill: white; -fx-font-size: 24px; -fx-font-weight: bold;">
+                <font>
+                    <Font name="System Bold" size="24.0" />
+                </font>
+            </Label>
+            
+            <!-- Stats Bar -->
+            <HBox spacing="20" alignment="CENTER">
+                <VBox spacing="5" style="-fx-padding: 15; -fx-background-color: #34495e; -fx-border-radius: 8; -fx-border-color: #e74c3c; -fx-border-width: 2;" 
+                      alignment="CENTER" minWidth="150" prefWidth="150" maxWidth="150">
+                    <Label text="Total Cells" style="-fx-text-fill: #bdc3c7; -fx-font-size: 14px;" />
+                    <Label fx:id="totalCellsLabel" text="0" 
+                           style="-fx-text-fill: white; -fx-font-size: 24px; -fx-font-weight: bold;" />
+                </VBox>
+                
+                <VBox spacing="5" style="-fx-padding: 15; -fx-background-color: #34495e; -fx-border-radius: 8; -fx-border-color: #f39c12; -fx-border-width: 2;" 
+                      alignment="CENTER" minWidth="150" prefWidth="150" maxWidth="150">
+                    <Label text="Occupied Cells" style="-fx-text-fill: #bdc3c7; -fx-font-size: 14px;" />
+                    <Label fx:id="occupiedCellsLabel" text="0" 
+                           style="-fx-text-fill: white; -fx-font-size: 24px; -fx-font-weight: bold;" />
+                </VBox>
+                
+                <VBox spacing="5" style="-fx-padding: 15; -fx-background-color: #34495e; -fx-border-radius: 8; -fx-border-color: #3498db; -fx-border-width: 2;" 
+                      alignment="CENTER" minWidth="150" prefWidth="150" maxWidth="150">
+                    <Label text="Occupancy Rate" style="-fx-text-fill: #bdc3c7; -fx-font-size: 14px;" />
+                    <Label fx:id="occupancyRateLabel" text="0%" 
+                           style="-fx-text-fill: white; -fx-font-size: 24px; -fx-font-weight: bold;" />
+                </VBox>
+                
+                <VBox spacing="5" style="-fx-padding: 15; -fx-background-color: #34495e; -fx-border-radius: 8; -fx-border-color: #2ecc71; -fx-border-width: 2;" 
+                      alignment="CENTER" minWidth="150" prefWidth="150" maxWidth="150">
+                    <Label text="Available Cells" style="-fx-text-fill: #bdc3c7; -fx-font-size: 14px;" />
+                    <Label fx:id="availableCellsLabel" text="0" 
+                           style="-fx-text-fill: white; -fx-font-size: 24px; -fx-font-weight: bold;" />
+                </VBox>
+            </HBox>
+        </VBox>
+    </top>
+    
+    <!-- Main Content: Table -->
+    <center>
+        <TableView fx:id="cellsTable" 
+                   style="-fx-background-color: white; -fx-border-color: #dcdcdc; -fx-border-width: 1;"
+                   BorderPane.alignment="CENTER">
+            <columns>
+                <TableColumn fx:id="cellNumberColumn" text="Cell Number" minWidth="120" prefWidth="120" />
+                <TableColumn fx:id="cellTypeColumn" text="Type" minWidth="100" prefWidth="100" />
+                <TableColumn fx:id="capacityColumn" text="Capacity" minWidth="80" prefWidth="80" />
+                <TableColumn fx:id="occupiedColumn" text="Occupied" minWidth="80" prefWidth="80" />
+                <TableColumn fx:id="availableColumn" text="Available" minWidth="80" prefWidth="80" />
+                <TableColumn fx:id="statusColumn" text="Status" minWidth="100" prefWidth="100" />
+                <TableColumn fx:id="securityColumn" text="Security Level" minWidth="120" prefWidth="120" />
+            </columns>
+        </TableView>
+    </center>
+    
+    <!-- Footer with Action Buttons -->
+    <bottom>
+        <HBox spacing="15" alignment="CENTER" style="-fx-background-color: #2c3e50; -fx-padding: 15;">
+            <Button text="Show Available" onAction="#handleShowAvailable" 
+                    style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-border-radius: 5; -fx-pref-width: 150; -fx-pref-height: 35;" />
+            <Button text="Show All" onAction="#handleShowAll" 
+                    style="-fx-background-color: #f39c12; -fx-text-fill: white; -fx-font-weight: bold; -fx-border-radius: 5; -fx-pref-width: 150; -fx-pref-height: 35;" />
+            <Button text="Refresh" onAction="#handleRefresh" 
+                    style="-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-font-weight: bold; -fx-border-radius: 5; -fx-pref-width: 150; -fx-pref-height: 35;" />
+        </HBox>
+    </bottom>
+    
+</BorderPane>

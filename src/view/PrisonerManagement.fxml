@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" 
+            fx:controller="controller.PrisonerManagementController"
+            style="-fx-background-color: #2c3e50;">
+
+    <!-- Header Section -->
+    <top>
+        <VBox spacing="10" style="-fx-background-color: #34495e; -fx-padding: 20;">
+            <Label text="Prisoner Management System" 
+                   style="-fx-text-fill: white; -fx-font-size: 28px; -fx-font-weight: bold;">
+                <font>
+                    <Font name="System Bold" size="28.0" />
+                </font>
+            </Label>
+            
+            <!-- Search and Filter Section -->
+            <HBox spacing="15" alignment="CENTER_LEFT">
+                <Label text="Search:" style="-fx-text-fill: white; -fx-font-size: 14px;" />
+                <TextField fx:id="searchField" promptText="Search by ID, Name, Crime, or Cell" 
+                          style="-fx-background-color: #ecf0f1; -fx-border-color: #3498db; -fx-border-radius: 5; -fx-pref-width: 250; -fx-pref-height: 35;" />
+                
+                <Label text="Status:" style="-fx-text-fill: white; -fx-font-size: 14px;" />
+                <ComboBox fx:id="filterStatusComboBox" 
+                         style="-fx-background-color: #ecf0f1; -fx-border-color: #3498db; -fx-border-radius: 5; -fx-pref-width: 120; -fx-pref-height: 35;" />
+                
+                <Label text="Cell:" style="-fx-text-fill: white; -fx-font-size: 14px;" />
+                <ComboBox fx:id="filterPrisonCellComboBox" 
+                         style="-fx-background-color: #ecf0f1; -fx-border-color: #3498db; -fx-border-radius: 5; -fx-pref-width: 120; -fx-pref-height: 35;" />
+                
+                <Button text="Search" onAction="#handleSearch" 
+                       style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-border-radius: 5; -fx-pref-width: 100; -fx-pref-height: 35;" />
+                
+                <Button text="Clear" onAction="#handleClear" 
+                       style="-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-font-weight: bold; -fx-border-radius: 5; -fx-pref-width: 100; -fx-pref-height: 35;" />
+                
+                <Button text="Refresh" onAction="#handleRefresh" 
+                       style="-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-font-weight: bold; -fx-border-radius: 5; -fx-pref-width: 100; -fx-pref-height: 35;" />
+            </HBox>
+        </VBox>
+    </top>
+
+    <!-- Main Content: Prisoners Table -->
+    <center>
+        <VBox spacing="15" style="-fx-padding: 15;">
+            <TableView fx:id="prisonerTable" style="-fx-background-color: #ecf0f1; -fx-border-color: #bdc3c7; -fx-border-radius: 5;">
+                <columns>
+                    <TableColumn fx:id="prisonerIdColumn" text="Prisoner ID" minWidth="100" prefWidth="100" />
+                    <TableColumn fx:id="nameColumn" text="Name" minWidth="150" prefWidth="150" />
+                    <TableColumn fx:id="crimeColumn" text="Crime" minWidth="200" prefWidth="200" />
+                    <TableColumn fx:id="cellColumn" text="Cell" minWidth="80" prefWidth="80" />
+                    <TableColumn fx:id="sentenceColumn" text="Sentence" minWidth="100" prefWidth="100" />
+                    <TableColumn fx:id="statusColumn" text="Status" minWidth="100" prefWidth="100" />
+                </columns>
+            </TableView>
+            
+            <!-- Prisoner Action Buttons -->
+            <HBox spacing="15" alignment="CENTER_RIGHT">
+                <Button text="View Details" onAction="#handleViewDetails" 
+                       style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-border-radius: 5; -fx-pref-width: 120; -fx-pref-height: 35;" />
+                <Button text="Release" onAction="#handleReleasePrisoner" 
+                       style="-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-font-weight: bold; -fx-border-radius: 5; -fx-pref-width: 120; -fx-pref-height: 35;" />
+                <Button text="Transfer" onAction="#handleTransferPrisoner" 
+                       style="-fx-background-color: #f39c12; -fx-text-fill: white; -fx-font-weight: bold; -fx-border-radius: 5; -fx-pref-width: 120; -fx-pref-height: 35;" />
+            </HBox>
+        </VBox>
+    </center>
+
+    <!-- Side Panel: Prisoner Details Form -->
+    <right>
+        <VBox spacing="20" style="-fx-background-color: #34495e; -fx-padding: 20; -fx-min-width: 350; -fx-max-width: 400;">
+            <Label text="Prisoner Details" style="-fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: bold;" />
+            
+            <Separator style="-fx-background-color: #7f8c8d;" />
+            
+            <GridPane hgap="10" vgap="15">
+                <columnConstraints>
+                    <ColumnConstraints minWidth="100" prefWidth="120" />
+                    <ColumnConstraints minWidth="150" prefWidth="200" />
+                </columnConstraints>
+                
+                <!-- Prisoner ID -->
+                <Label text="Prisoner ID:" style="-fx-text-fill: white;" GridPane.rowIndex="0" GridPane.columnIndex="0" />
+                <TextField fx:id="prisonerIdField" promptText="Enter prisoner ID" 
+                          style="-fx-background-color: #ecf0f1; -fx-border-color: #bdc3c7; -fx-border-radius: 5; -fx-pref-height: 35;" 
+                          GridPane.rowIndex="0" GridPane.columnIndex="1" />
+                
+                <!-- Name -->
+                <Label text="Name:" style="-fx-text-fill: white;" GridPane.rowIndex="1" GridPane.columnIndex="0" />
+                <TextField fx:id="nameField" promptText="Enter full name" 
+                          style="-fx-background-color: #ecf0f1; -fx-border-color: #bdc3c7; -fx-border-radius: 5; -fx-pref-height: 35;" 
+                          GridPane.rowIndex="1" GridPane.columnIndex="1" />
+                
+                <!-- Phone -->
+                <Label text="Phone:" style="-fx-text-fill: white;" GridPane.rowIndex="2" GridPane.columnIndex="0" />
+                <TextField fx:id="phoneField" promptText="Enter phone number" 
+                          style="-fx-background-color: #ecf0f1; -fx-border-color: #bdc3c7; -fx-border-radius: 5; -fx-pref-height: 35;" 
+                          GridPane.rowIndex="2" GridPane.columnIndex="1" />
+                
+                <!-- Crime -->
+                <Label text="Crime:" style="-fx-text-fill: white;" GridPane.rowIndex="3" GridPane.columnIndex="0" />
+                <TextField fx:id="crimeField" promptText="Enter crime" 
+                          style="-fx-background-color: #ecf0f1; -fx-border-color: #bdc3c7; -fx-border-radius: 5; -fx-pref-height: 35;" 
+                          GridPane.rowIndex="3" GridPane.columnIndex="1" />
+                
+                <!-- Cell Number -->
+                <Label text="Cell Number:" style="-fx-text-fill: white;" GridPane.rowIndex="4" GridPane.columnIndex="0" />
+                <ComboBox fx:id="cellComboBox" promptText="Select cell" 
+                         style="-fx-background-color: #ecf0f1; -fx-border-color: #bdc3c7; -fx-border-radius: 5; -fx-pref-height: 35;" 
+                         GridPane.rowIndex="4" GridPane.columnIndex="1" />
+                
+                <!-- Sentence Duration -->
+                <Label text="Sentence:" style="-fx-text-fill: white;" GridPane.rowIndex="5" GridPane.columnIndex="0" />
+                <ComboBox fx:id="sentenceComboBox" 
+                         style="-fx-background-color: #ecf0f1; -fx-border-color: #bdc3c7; -fx-border-radius: 5; -fx-pref-height: 35;" 
+                         GridPane.rowIndex="5" GridPane.columnIndex="1" />
+                
+                <!-- Admission Date -->
+                <Label text="Admission Date:" style="-fx-text-fill: white;" GridPane.rowIndex="6" GridPane.columnIndex="0" />
+                <DatePicker fx:id="admissionDatePicker" 
+                           style="-fx-background-color: #ecf0f1; -fx-border-color: #bdc3c7; -fx-border-radius: 5; -fx-pref-height: 35;" 
+                           GridPane.rowIndex="6" GridPane.columnIndex="1" />
+                
+                <!-- Status -->
+                <Label text="Status:" style="-fx-text-fill: white;" GridPane.rowIndex="7" GridPane.columnIndex="0" />
+                <ComboBox fx:id="statusComboBox" 
+                         style="-fx-background-color: #ecf0f1; -fx-border-color: #bdc3c7; -fx-border-radius: 5; -fx-pref-height: 35;" 
+                         GridPane.rowIndex="7" GridPane.columnIndex="1" />
+                
+                <!-- Notes -->
+                <Label text="Notes:" style="-fx-text-fill: white;" GridPane.rowIndex="8" GridPane.columnIndex="0" />
+                <TextArea fx:id="notesArea" promptText="Additional notes..." wrapText="true"
+                         style="-fx-background-color: #ecf0f1; -fx-border-color: #bdc3c7; -fx-border-radius: 5; -fx-pref-height: 100;" 
+                         GridPane.rowIndex="8" GridPane.columnIndex="1" 
+                         GridPane.rowSpan="2" />
+            </GridPane>
+            
+            <Separator style="-fx-background-color: #7f8c8d;" />
+            
+            <!-- CRUD Buttons -->
+            <HBox spacing="15" alignment="CENTER">
+                <Button text="Add" onAction="#handleAddPrisoner" 
+                       style="-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-font-weight: bold; -fx-border-radius: 5; -fx-pref-width: 100; -fx-pref-height: 35;" />
+                <Button text="Update" onAction="#handleUpdatePrisoner" 
+                       style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-border-radius: 5; -fx-pref-width: 100; -fx-pref-height: 35;" />
+                <Button text="Delete" onAction="#handleDeletePrisoner" 
+                       style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-border-radius: 5; -fx-pref-width: 100; -fx-pref-height: 35;" />
+            </HBox>
+        </VBox>
+    </right> 
+</BorderPane>

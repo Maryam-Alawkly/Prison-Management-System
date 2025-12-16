@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" 
+            fx:controller="controller.ReportManagementController"
+            style="-fx-background-color: #2c3e50;">
+
+    <!-- Header Section -->
+    <top>
+        <VBox spacing="15" style="-fx-background-color: #34495e; -fx-padding: 20;">
+            <Label text="Report Management System" 
+                   style="-fx-text-fill: white; -fx-font-size: 28px; -fx-font-weight: bold;">
+                <font>
+                    <Font name="System Bold" size="28.0" />
+                </font>
+            </Label>
+            
+            <!-- Search and Filter Section -->
+            <VBox spacing="12">
+                <!-- Search Row -->
+                <HBox spacing="15" alignment="CENTER_LEFT">
+                    <Label text="Search Reports:" style="-fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;" />
+                    <TextField fx:id="searchField" promptText="Search by Report ID, Officer, or Content" 
+                               style="-fx-background-color: #ecf0f1; -fx-border-color: #3498db; -fx-border-radius: 5; -fx-pref-width: 300;" />
+                </HBox>
+                
+                <!-- Filter Row -->
+                <HBox spacing="15" alignment="CENTER_LEFT">
+                    <!-- Status Filter -->
+                    <VBox spacing="5">
+                        <Label text="Status:" style="-fx-text-fill: white; -fx-font-size: 12px;" />
+                        <ComboBox fx:id="filterStatusComboBox" 
+                                  style="-fx-background-color: #ecf0f1; -fx-border-color: #3498db; -fx-border-radius: 5; -fx-pref-width: 140;" />
+                    </VBox>
+                    
+                    <!-- Type Filter -->
+                    <VBox spacing="5">
+                        <Label text="Report Type:" style="-fx-text-fill: white; -fx-font-size: 12px;" />
+                        <ComboBox fx:id="filterTypeComboBox" 
+                                  style="-fx-background-color: #ecf0f1; -fx-border-color: #3498db; -fx-border-radius: 5; -fx-pref-width: 140;" />
+                    </VBox>
+                    
+                    <!-- Date Range -->
+                    <VBox spacing="5">
+                        <Label text="Date From:" style="-fx-text-fill: white; -fx-font-size: 12px;" />
+                        <DatePicker fx:id="filterDateFromPicker" 
+                                    style="-fx-background-color: #ecf0f1; -fx-border-color: #3498db; -fx-border-radius: 5; -fx-pref-width: 140;" />
+                    </VBox>
+                    
+                    <VBox spacing="5">
+                        <Label text="Date To:" style="-fx-text-fill: white; -fx-font-size: 12px;" />
+                        <DatePicker fx:id="filterDateToPicker" 
+                                    style="-fx-background-color: #ecf0f1; -fx-border-color: #3498db; -fx-border-radius: 5; -fx-pref-width: 140;" />
+                    </VBox>
+                    
+                    <!-- Action Buttons -->
+                    <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-padding: 15 0 0 0;">
+                        <Button text="Search" onAction="#handleSearch" 
+                                style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-border-radius: 5; -fx-padding: 8 25; -fx-min-width: 100;" />
+                        <Button text="Clear" onAction="#handleClear" 
+                                style="-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-font-weight: bold; -fx-border-radius: 5; -fx-padding: 8 25; -fx-min-width: 100;" />
+                        <Button text="Refresh" onAction="#handleRefresh" 
+                                style="-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-font-weight: bold; -fx-border-radius: 5; -fx-padding: 8 25; -fx-min-width: 100;" />
+                    </HBox>
+                </HBox>
+            </VBox>
+        </VBox>
+    </top>
+
+    <!-- Main Content: Reports Table -->
+    <center>
+        <VBox spacing="15" style="-fx-padding: 20;">
+            <!-- Table Header -->
+            <HBox alignment="CENTER_LEFT">
+                <Label text="All Reports" style="-fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold;" />
+                <Region HBox.hgrow="ALWAYS" />
+                <Label fx:id="totalReportsLabel" text="Total Reports: 0" 
+                       style="-fx-text-fill: #bdc3c7; -fx-font-size: 14px;" />
+            </HBox>
+            
+            <!-- Table -->
+            <TableView fx:id="reportTable" style="-fx-background-color: white; -fx-border-color: #bdc3c7; -fx-border-radius: 5;">
+                <columns>
+                    <TableColumn fx:id="reportIdColumn" text="Report ID" minWidth="100" />
+                    <TableColumn fx:id="officerNameColumn" text="Officer" minWidth="120" />
+                    <TableColumn fx:id="reportTypeColumn" text="Type" minWidth="100" />
+                    <TableColumn fx:id="reportDateColumn" text="Date" minWidth="90" />
+                    <TableColumn fx:id="statusColumn" text="Status" minWidth="90" />
+                    <TableColumn fx:id="priorityColumn" text="Priority" minWidth="80" />
+                    <TableColumn fx:id="securityLevelColumn" text="Security" minWidth="90" />
+                    <TableColumn fx:id="createdAtColumn" text="Submitted" minWidth="100" />
+                </columns>
+            </TableView>
+            
+            <!-- Report Action Buttons -->
+            <HBox spacing="15" alignment="CENTER" style="-fx-padding: 10;">
+                <Button text="View Report" onAction="#handleViewFullReport" 
+                        style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-border-radius: 5; -fx-padding: 10 25; -fx-min-width: 140;" />
+                <Button text="Approve" onAction="#handleApproveReport" 
+                        style="-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-font-weight: bold; -fx-border-radius: 5; -fx-padding: 10 25; -fx-min-width: 140;" />
+                <Button text="Reject" onAction="#handleRejectReport" 
+                        style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-border-radius: 5; -fx-padding: 10 25; -fx-min-width: 140;" />
+                <Button text="Add Comment" onAction="#handleAddComment" 
+                        style="-fx-background-color: #f39c12; -fx-text-fill: white; -fx-font-weight: bold; -fx-border-radius: 5; -fx-padding: 10 25; -fx-min-width: 140;" />
+            </HBox>
+        </VBox>
+    </center>
+
+    <!-- Side Panel: Quick Preview -->
+    <right>
+        <ScrollPane style="-fx-background-color: transparent; -fx-border-color: transparent;" 
+                    fitToWidth="true" fitToHeight="true">
+            <VBox spacing="20" style="-fx-background-color: #34495e; -fx-padding: 25; -fx-min-width: 420;">
+                <Label text="Report Preview" style="-fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: bold;" />
+                
+                <Separator style="-fx-background-color: #7f8c8d;" />
+                
+                <VBox spacing="15">
+                    <!-- Basic Info -->
+                    <Label text="Basic Information" style="-fx-text-fill: #3498db; -fx-font-weight: bold; -fx-font-size: 14px;" />
+                    <GridPane hgap="15" vgap="12">
+                        <columnConstraints>
+                            <ColumnConstraints minWidth="110" />
+                            <ColumnConstraints minWidth="180" />
+                        </columnConstraints>
+                        
+                        <Label text="Report ID:" style="-fx-text-fill: white; -fx-font-weight: bold;" GridPane.rowIndex="0" GridPane.columnIndex="0" />
+                        <Label fx:id="previewReportId" style="-fx-text-fill: #ecf0f1; -fx-font-weight: bold;" 
+                               GridPane.rowIndex="0" GridPane.columnIndex="1" />
+                        
+                        <Label text="Officer:" style="-fx-text-fill: white; -fx-font-weight: bold;" GridPane.rowIndex="1" GridPane.columnIndex="0" />
+                        <Label fx:id="previewOfficer" style="-fx-text-fill: #ecf0f1;" GridPane.rowIndex="1" GridPane.columnIndex="1" />
+                        
+                        <Label text="Report Type:" style="-fx-text-fill: white; -fx-font-weight: bold;" GridPane.rowIndex="2" GridPane.columnIndex="0" />
+                        <Label fx:id="previewType" style="-fx-text-fill: #ecf0f1;" GridPane.rowIndex="2" GridPane.columnIndex="1" />
+                        
+                        <Label text="Status:" style="-fx-text-fill: white; -fx-font-weight: bold;" GridPane.rowIndex="3" GridPane.columnIndex="0" />
+                        <Label fx:id="previewStatus" style="-fx-text-fill: #2ecc71; -fx-font-weight: bold;" GridPane.rowIndex="3" GridPane.columnIndex="1" />
+                        
+                        <Label text="Priority:" style="-fx-text-fill: white; -fx-font-weight: bold;" GridPane.rowIndex="4" GridPane.columnIndex="0" />
+                        <Label fx:id="previewPriority" style="-fx-text-fill: #e74c3c; -fx-font-weight: bold;" GridPane.rowIndex="4" GridPane.columnIndex="1" />
+                    </GridPane>
+                    
+                    <!-- Summary -->
+                    <Label text="Incidents Summary" style="-fx-text-fill: #3498db; -fx-font-weight: bold; -fx-font-size: 14px;" />
+                    <TextArea fx:id="previewIncidents" wrapText="true" 
+                              style="-fx-background-color: #2c3e50; -fx-text-fill: white; -fx-border-color: #7f8c8d; -fx-border-radius: 5; -fx-min-height: 100;" 
+                              editable="false" />
+                    
+                    <!-- Statistics -->
+                    <Label text="Activity Statistics" style="-fx-text-fill: #3498db; -fx-font-weight: bold; -fx-font-size: 14px;" />
+                    <HBox spacing="40" alignment="CENTER">
+                        <VBox spacing="5" alignment="CENTER">
+                            <Label text="Patrols" style="-fx-text-fill: white; -fx-font-size: 12px;" />
+                            <Label fx:id="previewPatrols" text="0" 
+                                   style="-fx-text-fill: #3498db; -fx-font-size: 20px; -fx-font-weight: bold;" />
+                        </VBox>
+                        
+                        <VBox spacing="5" alignment="CENTER">
+                            <Label text="Inspections" style="-fx-text-fill: white; -fx-font-size: 12px;" />
+                            <Label fx:id="previewInspections" text="0" 
+                                   style="-fx-text-fill: #2ecc71; -fx-font-size: 20px; -fx-font-weight: bold;" />
+                        </VBox>
+                        
+                        <VBox spacing="5" alignment="CENTER">
+                            <Label text="Prisoners" style="-fx-text-fill: white; -fx-font-size: 12px;" />
+                            <Label fx:id="previewPrisoners" text="0" 
+                                   style="-fx-text-fill: #f39c12; -fx-font-size: 20px; -fx-font-weight: bold;" />
+                        </VBox>
+                    </HBox>
+                    
+                    <!-- Admin Actions -->
+                    <Separator style="-fx-background-color: #7f8c8d;" />
+                    
+                    <Label text="Admin Comments" style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14px;" />
+                    <TextArea fx:id="adminCommentsArea" promptText="Enter your comments here..." wrapText="true"
+                              style="-fx-background-color: #ecf0f1; -fx-border-color: #bdc3c7; -fx-border-radius: 5; -fx-min-height: 100;" />
+                    
+                    <HBox spacing="15" alignment="CENTER">
+                        <Button text="Save Comment" onAction="#handleSaveComment" 
+                                style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-border-radius: 5; -fx-padding: 10 25; -fx-pref-width: 150;" />
+                    </HBox>
+                </VBox>
+            </VBox>
+        </ScrollPane>
+    </right>
+
+    <!-- Footer -->
+    <bottom>
+        <HBox style="-fx-background-color: #34495e; -fx-padding: 15;" alignment="CENTER">
+            <Label text="Report Management System - Prison Management System © 2025" 
+                   style="-fx-text-fill: #bdc3c7; -fx-font-size: 14px;" />
+        </HBox>
+    </bottom>
+
+</BorderPane>

@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" 
+            fx:controller="controller.DailyReportController"
+            style="-fx-background-color: #2c3e50;">
+
+    <!-- Header Section -->
+    <top>
+        <VBox spacing="10" style="-fx-background-color: #34495e; -fx-padding: 20;">
+            <Label text="Daily Activity Report" 
+                   style="-fx-text-fill: white; -fx-font-size: 28px; -fx-font-weight: bold;" />
+            
+            <HBox spacing="20" alignment="CENTER_LEFT">
+                <Label text="Officer:" style="-fx-text-fill: white; -fx-font-size: 14px;" />
+                <Label fx:id="officerNameLabel" text="Officer Name" 
+                       style="-fx-text-fill: #3498db; -fx-font-size: 14px; -fx-font-weight: bold;" />
+                
+                <Label text="Date:" style="-fx-text-fill: white; -fx-font-size: 14px;" />
+                <Label fx:id="currentDateLabel" text="2025-01-01" 
+                       style="-fx-text-fill: #3498db; -fx-font-size: 14px; -fx-font-weight: bold;" />
+                
+                <Label text="Shift:" style="-fx-text-fill: white; -fx-font-size: 14px;" />
+                <Label fx:id="shiftLabel" text="08:00 - 16:00" 
+                       style="-fx-text-fill: #3498db; -fx-font-size: 14px; -fx-font-weight: bold;" />
+            </HBox>
+        </VBox>
+    </top>
+
+    <!-- Main Content with ScrollPane -->
+    <center>
+        <ScrollPane fitToWidth="true" style="-fx-background: #2c3e50; -fx-border-color: transparent;">
+            <VBox spacing="15" style="-fx-padding: 20;">
+                <!-- Basic Info -->
+                <VBox style="-fx-background-color: #34495e; -fx-background-radius: 8; -fx-padding: 15;" spacing="10">
+                    <Label text="Basic Information" style="-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;" />
+                    <Separator style="-fx-background-color: #7f8c8d;" />
+                    
+                    <VBox spacing="10">
+                        <HBox spacing="10" alignment="CENTER_LEFT">
+                            <Label text="Report ID:" style="-fx-text-fill: white; -fx-min-width: 120;" />
+                            <TextField fx:id="reportIdField" style="-fx-background-color: #ecf0f1; -fx-min-width: 250;" 
+                                      editable="false" />
+                        </HBox>
+                        
+                        <HBox spacing="10" alignment="CENTER_LEFT">
+                            <Label text="Report Type:" style="-fx-text-fill: white; -fx-min-width: 120;" />
+                            <ComboBox fx:id="reportTypeComboBox" style="-fx-background-color: #ecf0f1; -fx-min-width: 250;" />
+                        </HBox>
+                        
+                        <HBox spacing="10" alignment="CENTER_LEFT">
+                            <Label text="Priority:" style="-fx-text-fill: white; -fx-min-width: 120;" />
+                            <ComboBox fx:id="priorityComboBox" style="-fx-background-color: #ecf0f1; -fx-min-width: 250;" />
+                        </HBox>
+                        
+                        <HBox spacing="10" alignment="CENTER_LEFT">
+                            <Label text="Report Date:" style="-fx-text-fill: white; -fx-min-width: 120;" />
+                            <DatePicker fx:id="reportDatePicker" style="-fx-background-color: #ecf0f1; -fx-min-width: 250;" />
+                        </HBox>
+                    </VBox>
+                </VBox>
+                
+                <!-- Incident Report -->
+                <VBox style="-fx-background-color: #34495e; -fx-background-radius: 8; -fx-padding: 15;" spacing="10">
+                    <Label text="Incident Report" style="-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;" />
+                    <Separator style="-fx-background-color: #7f8c8d;" />
+                    
+                    <VBox spacing="10">
+                        <Label text="Incident Description:" style="-fx-text-fill: white;" />
+                        <TextArea fx:id="incidentsArea" promptText="Describe any incidents..." 
+                                 style="-fx-background-color: #ecf0f1; -fx-min-height: 80; -fx-pref-height: 80;" wrapText="true" />
+                        
+                        <Label text="Actions Taken:" style="-fx-text-fill: white;" />
+                        <TextArea fx:id="actionsArea" promptText="Describe actions taken..." 
+                                 style="-fx-background-color: #ecf0f1; -fx-min-height: 80; -fx-pref-height: 80;" wrapText="true" />
+                    </VBox>
+                </VBox>
+                
+                <!-- Daily Activities -->
+                <VBox style="-fx-background-color: #34495e; -fx-background-radius: 8; -fx-padding: 15;" spacing="10">
+                    <Label text="Daily Activities" style="-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;" />
+                    <Separator style="-fx-background-color: #7f8c8d;" />
+                    
+                    <VBox spacing="10">
+                        <HBox spacing="20" alignment="CENTER_LEFT">
+                            <VBox spacing="5">
+                                <Label text="Patrols Completed:" style="-fx-text-fill: white;" />
+                                <TextField fx:id="patrolsField" promptText="Number" 
+                                          style="-fx-background-color: #ecf0f1; -fx-pref-width: 120;" />
+                            </VBox>
+                            
+                            <VBox spacing="5">
+                                <Label text="Inspections:" style="-fx-text-fill: white;" />
+                                <TextField fx:id="inspectionsField" promptText="Number" 
+                                          style="-fx-background-color: #ecf0f1; -fx-pref-width: 120;" />
+                            </VBox>
+                            
+                            <VBox spacing="5">
+                                <Label text="Visitor Screenings:" style="-fx-text-fill: white;" />
+                                <TextField fx:id="screeningsField" promptText="Number" 
+                                          style="-fx-background-color: #ecf0f1; -fx-pref-width: 120;" />
+                            </VBox>
+                        </HBox>
+                        
+                        <Label text="Activity Details:" style="-fx-text-fill: white;" />
+                        <TextArea fx:id="activityDetailsArea" promptText="Describe daily activities..." 
+                                 style="-fx-background-color: #ecf0f1; -fx-min-height: 80; -fx-pref-height: 80;" wrapText="true" />
+                    </VBox>
+                </VBox>
+                
+                <!-- Notes -->
+                <VBox style="-fx-background-color: #34495e; -fx-background-radius: 8; -fx-padding: 15;" spacing="10">
+                    <Label text="Additional Notes" style="-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;" />
+                    <Separator style="-fx-background-color: #7f8c8d;" />
+                    
+                    <TextArea fx:id="notesArea" promptText="Enter any additional notes..." 
+                             style="-fx-background-color: #ecf0f1; -fx-min-height: 100; -fx-pref-height: 100;" wrapText="true" />
+                </VBox>
+                
+                <!-- Buttons - في نهاية المحتوى -->
+                <VBox spacing="15" alignment="CENTER" style="-fx-padding: 20 0 30 0;">
+                    <HBox spacing="15" alignment="CENTER">
+                        <Button text="Save Draft" onAction="#handleSaveDraft" 
+                               style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; 
+                                      -fx-pref-width: 120; -fx-padding: 10;" />
+                        <Button text="Submit Report" onAction="#handleSubmitReport" 
+                               style="-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-font-weight: bold; 
+                                      -fx-pref-width: 120; -fx-padding: 10;" />
+                        <Button text="Clear Form" onAction="#handleClearForm" 
+                               style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; 
+                                      -fx-pref-width: 120; -fx-padding: 10;" />
+                    </HBox>
+                    
+                    <Label text="Note: Submitted reports cannot be edited" 
+                           style="-fx-text-fill: #f39c12; -fx-font-size: 12px;" />
+                </VBox>
+            </VBox>
+        </ScrollPane>
+    </center>
+
+    <!-- Footer -->
+    <bottom>
+        <HBox style="-fx-background-color: #34495e; -fx-padding: 10;" alignment="CENTER">
+            <Label text="Daily Report System - Prison Management © 2025" 
+                   style="-fx-text-fill: #bdc3c7; -fx-font-size: 12px;" />
+        </HBox>
+    </bottom>
+
+</BorderPane>
