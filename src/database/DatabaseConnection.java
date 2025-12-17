@@ -17,7 +17,7 @@ public class DatabaseConnection {
     // Database connection parameters
     private static final String URL = "jdbc:mysql://localhost:3306/prison_management_system";
     private static final String USERNAME = "root";
-    private static final String PASSWORD = "7187480"; //your_password_in_mySql
+    private static final String PASSWORD = " "; //your_password_in_mySql
 
     // Database connection object
     private Connection connection;
