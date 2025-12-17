@@ -50,7 +50,7 @@
                             <Label text="System Status" 
                                    style="-fx-text-fill: #bdc3c7; -fx-font-size: 14px; -fx-font-family: 'Segoe UI', Arial, sans-serif;" />
                             <Label fx:id="systemStatusLabel" text="NORMAL" 
-                                   style="-fx-text-fill: #2ecc71; -fx-font-size: 28px; -fx-font-weight: bold; -fx-font-family: 'Segoe UI', Arial, sans-serif;" />
+                                   style="-fx-text-fill: #2ecc71; -fx-font-size: 34px; -fx-font-weight: bold; -fx-font-family: 'Segoe UI', Arial, sans-serif;" />
                         </VBox>
                         
                         <!-- Critical Logs Card -->

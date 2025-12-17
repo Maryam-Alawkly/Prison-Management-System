@@ -987,7 +987,7 @@ public class SecurityManagementController implements Initializable {
      */
     private void setStatusCritical() {
         systemStatusLabel.setText("Critical");
-        systemStatusLabel.setStyle("-fx-text-fill: #f39c12; -fx-font-weight: bold;");
+        systemStatusLabel.setStyle("-fx-text-fill: #f39c12; 34px; -fx-font-weight: bold;");
         systemModeLabel.setText("Critical Mode");
         systemModeLabel.setStyle("-fx-text-fill: #f39c12; -fx-font-weight: bold;");
         securityLevelLabel.setText("High");
@@ -999,7 +999,7 @@ public class SecurityManagementController implements Initializable {
      */
     private void setStatusLockdown() {
         systemStatusLabel.setText("Lockdown");
-        systemStatusLabel.setStyle("-fx-text-fill: #e74c3c; -fx-font-weight: bold;");
+        systemStatusLabel.setStyle("-fx-text-fill: #e74c3c; 34px; -fx-font-weight: bold;");
         systemModeLabel.setText("Full Lockdown");
         systemModeLabel.setStyle("-fx-text-fill: #e74c3c; -fx-font-weight: bold;");
         securityLevelLabel.setText("Maximum");
